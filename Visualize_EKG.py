@@ -19,12 +19,12 @@ import matplotlib as plt
 import wfdb
 import csv
 
+
+######################### The following piece of codes where for plotting the EKG. I want to keep it for now.
+
 # path_to_file = "Brugada_dataset/files/188981/188981"
 
 # record = wfdb.rdrecord(path_to_file)
-
-
-
 
 # wfdb.plot_wfdb(record =record, title='Patient{recrod}', figsize=(14,8), ecg_grids = 'all', sharex = True) # This plots all 12 leads.
 # print(record.__dict__) ## Here you can add "__dict__['name of column you care about']" to highlight one specific area. Ex. p_signal, sig_name, shape
@@ -38,29 +38,16 @@ import csv
 # Plot only the first column (index 0)
 # p_signal is a numpy array [samples, channels]
 
-
-
 # wfdb.plot_items(signal=record.p_signal[:,0], title=f'Patient{path_to_file}')
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+######################### The preceeding piece of codes where for plotting the EKG.
 
 """
 As I understand it, we only care about V1 - V3 leads. So I want to isolate these 3 leads.
 
 Note to self: Later we can add back a few other leads to look for patterns in those leads as well, but for now let's focus on the ones that are used
     for diagnosis.
+Note to self: You can get a list of all the patients in the 'files' file and then have a while loop cycle through that list. (this is for main_ekg.py)
 """
 
 # # # Ok, I'd like to make a function that picks out the p_signal for a specific lead(s).
@@ -99,33 +86,3 @@ def get_EKG_leads(ptf, lead_s):
     p_signals = p_signals[:, positions]
 
     return p_signals
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# def make_EKG_plot(path_to_file): #The input here, is the directions to the .hea and .dat files. (should be a string)
-    
-#     record = wfdb.rdrecord(path_to_file)
-
-#     wfdb.plot_wfdb(record =record, title=f'Patient{path_to_file}', figsize=(14,8), ecg_grids = 'all', sharex = True)
-    
-# # You can get a list of all the patients in the 'files' file and then have a while loop cycle through that list. (this is for main_ekg.py)
