@@ -20,6 +20,7 @@ import pandas as pd
 import matplotlib as plt
 import wfdb
 
+import Visualize_EKG as vekg
 import Wavelet_approx as wa
 import construct_comples as cc
 # import construct_mapper as cmapper    # I don't want to do MAPPER with the EKG data, but I'm including it here. Just in case.
