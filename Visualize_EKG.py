@@ -19,29 +19,6 @@ import matplotlib as plt
 import wfdb
 import csv
 
-
-######################### The following piece of codes where for plotting the EKG. I want to keep it for now.
-
-# path_to_file = "Brugada_dataset/files/188981/188981"
-
-# record = wfdb.rdrecord(path_to_file)
-
-# wfdb.plot_wfdb(record =record, title='Patient{recrod}', figsize=(14,8), ecg_grids = 'all', sharex = True) # This plots all 12 leads.
-# print(record.__dict__) ## Here you can add "__dict__['name of column you care about']" to highlight one specific area. Ex. p_signal, sig_name, shape
-# array = record.__dict__['p_signal'] # This isolates the p_signals from the record, this is the 1200x12 matrix with the 12 leads as the columns.
-
-# wfdb.plot_wfdb(signal = record.p_signal[:,0], title='Patient{recrod}')
-
-# csv_file_name = f'blah_blah.csv'
-# np.savetxt(f'{csv_file_name}', array, delimiter=",")
-
-# Plot only the first column (index 0)
-# p_signal is a numpy array [samples, channels]
-
-# wfdb.plot_items(signal=record.p_signal[:,0], title=f'Patient{path_to_file}')
-
-######################### The preceeding piece of codes where for plotting the EKG.
-
 """
 As I understand it, we only care about V1 - V3 leads. So I want to isolate these 3 leads.
 
@@ -86,3 +63,67 @@ def get_EKG_leads(ptf, lead_s):
     p_signals = p_signals[:, positions]
 
     return p_signals
+
+# # Ok now I want to make a function that does all the plotting for me. If I want it to plot just V3 and v6, then it would just put those
+#   two together.
+#   Input: path to file and the leads I want plotted
+#   Output: a plot with the leads I want plotted.
+
+def plot_ekg(ptf, lead_s):
+
+    # NOTE TO SELF: you need to check that not all leads are wanted, because the funciton is different for all 12 than just a few of them.
+
+    # I want to input the lead(s) as an array of the title of the leads so if you wanted all twelve it would look like:
+    # lead_s = ['I', 'II', 'III', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6'] 
+    # Note that in __dict__ these are called 'sig_name'
+
+    record =  wfdb.rdrecord(ptf)
+    signal_names = record.__dict__['sig_name']
+
+    # Now I want to cycle through the lead_s and pick out the position in the p_signal which will match up with the place in the sig_name list.
+
+    i = 0
+    positions = []
+    while i<len(lead_s):
+        try:
+            lead_s[i] in signal_names
+            position = signal_names.index(lead_s[i])
+            positions.append(position)
+        except:
+            error_message = "You do not have the leads labeled correctly, refer to input information for how to input the leads."
+            return error_message
+        i = i+1
+
+
+    # # # Ok now I want to plot all the leads on the same plot.
+
+    # I need this little piece to name the y-axis of the subfigures.
+    i = 0
+    sig_names = []
+    sig_units_labels = []
+    while i < len(positions):
+        blah = record.sig_name[positions[i]]
+        sig_names.append(blah)
+        sig_units_labels.append('mV')
+        i = i+1
+
+    wfdb.plot_items(signal=record.p_signal[:, positions],
+                    ann_samp=None, 
+                    ann_sym=None, 
+                    fs=None,
+                    sig_name=sig_names, 
+                    sig_units=sig_units_labels,
+                    xlabel=None, 
+                    ylabel=None, 
+                    title=f'Patient {ptf}', 
+                    sig_style=[''],
+                    ann_style=['r*'], 
+                    ecg_grids=[], 
+                    figsize=(14,8),
+                    sharex=True, 
+                    sharey=False, 
+                    return_fig=False, 
+                    return_fig_axes=False)
+
+# print(record.__dict__) ## Here you can add "__dict__['name of column you care about']" to highlight one specific area. Ex. p_signal, sig_name, shape
+# record.__dict__['p_signal'] # This isolates the p_signals from the record, this is the 1200x12 matrix with the 12 leads as the columns.
