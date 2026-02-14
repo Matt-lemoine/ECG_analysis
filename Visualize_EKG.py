@@ -75,7 +75,7 @@ def get_EKG_leads(ptf, lead_s):
 
     return p_signals
 
-def plot_ekg(ptf, lead_s):
+def plot_ekg(ptf, lead_s, naming_things):
 
     record =  wfdb.rdrecord(ptf)
     signal_names = record.__dict__['sig_name']
@@ -114,7 +114,7 @@ def plot_ekg(ptf, lead_s):
                     sig_units=sig_units_labels,
                     xlabel=None, 
                     ylabel=None, 
-                    title=f'Patient {ptf}', 
+                    title=f'Patient {naming_things}', 
                     sig_style=[''],
                     ann_style=['r*'], 
                     ecg_grids=[], 
