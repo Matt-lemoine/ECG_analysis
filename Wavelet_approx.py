@@ -9,7 +9,3 @@ import matplotlib as plt
 def get_wave_eq(input):
 
     return wavelet_coefficients
-
-def get_sample_points(input, number_of_sample_poinst):
-
-    return sample_points

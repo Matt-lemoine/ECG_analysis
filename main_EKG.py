@@ -57,7 +57,7 @@ while cycle < num_patients:
     naming_things = f'{all_folder_names[cycle]}' # This is for labeling things. It calls the patient number treating it as a str.
     
 
-    "Step 1: Import the data"
+    "Step 1: Import the data" # done #
 
     ptf = f'Brugada_dataset/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}' # This gets you to the patient.
 
@@ -65,8 +65,6 @@ while cycle < num_patients:
 
 
     "Step 2: Wavelet Approximation"
-
-    # First pull the leads you want
 
     # Ideally for each of these pieces you would have a separate file that has the functions that you would import in the preamble.
 
@@ -87,12 +85,12 @@ while cycle < num_patients:
     # Call the function with the specified parameters
     persistence = cc.construct_calculate("normalized_data", max_dimension, max_edge_length, output_csv_name)
 
-
-    # Now compute the persistence barcodes or graph 
-    try:
-        cc.persistence_barcodes(persistence, output_file_barcodes)
-    except Exception as e:
-        print(f"An error occurred during the persistence barcodes: {e}")
+    # We probably don't want to look at the barcode, because there is no bottleneck distance for barcodes, but there is for the diagrams.
+    # # Now compute the persistence barcodes or graph 
+    # try:
+    #     cc.persistence_barcodes(persistence, output_file_barcodes)
+    # except Exception as e:
+    #     print(f"An error occurred during the persistence barcodes: {e}")
 
 
     try:
