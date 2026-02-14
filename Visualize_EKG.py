@@ -1,43 +1,54 @@
 """
-Notes for me:
+Notes on this file:
+    There are three functions in this file:
+
+    get_EKG_leads(ptf, lead_s)
+        Inputs:
+            path to file (ptf) which should be given as directions from the current folder you are in.
+            leads (lead_s) you want to isolate, which should be given as an array of strings out of the following list.
+                lead_s = ['I', 'II', 'III', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6']
+                Note: In WFDB, these leads are called the 'sig_name'. So, if you wanted to call these from WFDB, you'd use the command
+                    record.__dict__['sig_name']
+        Output:
+            An numpy array with the lead(s) that you want isolated
+    This function picks out the specific leads you are wanting as a numpy array.
+    
+    plot_ekg(ptf, lead_s)
+        Inputs:
+            path to file (ptf) which should be given as directions from the current folder you are in.
+            leads (lead_s) you want to plot, which should be given as an array of strings out of the following list.
+                lead_s = ['I', 'II', 'III', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6']
+        Output:
+            A matplotlib image of the leads you want plotted
+    This function plots the specific leads you are interested in.
+
+    get_all_info(ptf)
+        Input:
+            path to file (ptf)
+        Output:
+            A list of infromation about your EKG. This is exactly the 'record.__dict__' function from wfdb.
+    This function gets all the information about your EKG and prints it.
+
+
+Notes on how WFDB is used here:
+
 In the wfdb library, when you run __dict__['p_signal'], this return a numpy array of points along the different leads.
     So for example if you wanted to isolate one of the leads, you could do this by taking the following code:
     blah = record.__dict__['p_signal']
     I_lead = blah[0]
 
-Note that the 'blah' above is a {t*100} x 12 matrix, because it store the leads as the columns and the mV as the rows.
-The EKG records t*100 points for each lead. So that's 100 points for every second for every lead, there are 12 leads in our EKGs.
-For the Brugada Dataset, there are 12 seconds of record for each patient, so the matrices of leads is (1200 x 12).
+    Note that the 'blah' above is a {t*100} x 12 matrix, because it store the leads as the columns and the mV as the rows.
+    The EKG records t*100 points for each lead. So that's 100 points for every second for every lead, there are 12 leads in our EKGs.
+    For the Brugada Dataset, there are 12 seconds of record for each patient, so the matrices of leads is (1200 x 12).
 """
 
-# This is for visualizing the EKGs to make sure everything is up to snuff.
-
-# import the WFDB package
 import numpy as np
 import pandas as pd
 import matplotlib as plt
 import wfdb
 import csv
 
-"""
-As I understand it, we only care about V1 - V3 leads. So I want to isolate these 3 leads.
-
-Note to self: Later we can add back a few other leads to look for patterns in those leads as well, but for now let's focus on the ones that are used
-    for diagnosis.
-Note to self: You can get a list of all the patients in the 'files' file and then have a while loop cycle through that list. (this is for main_ekg.py)
-"""
-
-# # # Ok, I'd like to make a function that picks out the p_signal for a specific lead(s).
-# Your input: Path_to_file (PTF), lead(s)
-    # PTF should be given from the folder you are coding in.
-    # lead(s) should be given as an array of strings like I have in the def get_EKG_leads
-# Your output: a numpy array with the specific lead(s) asked for.
-
 def get_EKG_leads(ptf, lead_s):
-
-    # I want to input the lead(s) as an array of the title of the leads so if you wanted all twelve it would look like:
-    # lead_s = ['I', 'II', 'III', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6'] 
-    # Note that in __dict__ these are called 'sig_name'
 
     record =  wfdb.rdrecord(ptf)
     signal_names = record.__dict__['sig_name']
@@ -64,18 +75,7 @@ def get_EKG_leads(ptf, lead_s):
 
     return p_signals
 
-# # Ok now I want to make a function that does all the plotting for me. If I want it to plot just V3 and v6, then it would just put those
-#   two together.
-#   Input: path to file and the leads I want plotted
-#   Output: a plot with the leads I want plotted.
-
 def plot_ekg(ptf, lead_s):
-
-    # NOTE TO SELF: you need to check that not all leads are wanted, because the funciton is different for all 12 than just a few of them.
-
-    # I want to input the lead(s) as an array of the title of the leads so if you wanted all twelve it would look like:
-    # lead_s = ['I', 'II', 'III', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6'] 
-    # Note that in __dict__ these are called 'sig_name'
 
     record =  wfdb.rdrecord(ptf)
     signal_names = record.__dict__['sig_name']
@@ -94,7 +94,6 @@ def plot_ekg(ptf, lead_s):
             return error_message
         i = i+1
 
-
     # # # Ok now I want to plot all the leads on the same plot.
 
     # I need this little piece to name the y-axis of the subfigures.
@@ -107,7 +106,7 @@ def plot_ekg(ptf, lead_s):
         sig_units_labels.append('mV')
         i = i+1
 
-    wfdb.plot_items(signal=record.p_signal[:, positions],
+    return wfdb.plot_items(signal=record.p_signal[:, positions],
                     ann_samp=None, 
                     ann_sym=None, 
                     fs=None,
@@ -125,5 +124,10 @@ def plot_ekg(ptf, lead_s):
                     return_fig=False, 
                     return_fig_axes=False)
 
-# print(record.__dict__) ## Here you can add "__dict__['name of column you care about']" to highlight one specific area. Ex. p_signal, sig_name, shape
-# record.__dict__['p_signal'] # This isolates the p_signals from the record, this is the 1200x12 matrix with the 12 leads as the columns.
+def get_all_info(ptf):
+
+    record =  wfdb.rdrecord(ptf)
+
+    all_info = record.__dict__
+
+    return print(all_info)
