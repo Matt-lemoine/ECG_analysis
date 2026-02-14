@@ -1,5 +1,5 @@
 """
-This is Python code that starts to outline the pipeline for EKG analsis using Pers.Homol., Wavelets, and SWEs. 
+Analysis of Electrocardiography and its relation this with persistent homology and sliding window embeddings.
 
 Created by Matthew Lemoine
 Initialization: Feb. 6, 2026
