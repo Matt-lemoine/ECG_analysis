@@ -71,6 +71,9 @@ while cycle < num_patients:
 
     "Step 3: SWE"
 
+    # Under the folder that says Look At in Google Chrome there is a website for time-series-embedding implimented in python.
+    # The library used is called giotto-tda.
+
 
     "Step 4: Persistent Homology of SWE point cloud"
 
