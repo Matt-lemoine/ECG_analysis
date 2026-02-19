@@ -87,45 +87,52 @@ def construct_calculate(data_array, max_dimension, max_edge_length,csv_file_name
         # ok the above piece breaks our persistence list (dim, (birth, death)) into the dimension lists. The piece below does the 0-th homology pieces and includes the contributing points.
 
         csv_file_name_nocsv = csv_file_name.replace(".csv","")
-        output_csv_contributing_points_file = f"{csv_file_name_nocsv}_0_information.csv"
-        print("working on" + output_csv_contributing_points_file)
-        with open(output_csv_contributing_points_file, "w", newline="") as f:
-            writer = csv.writer(f)
-            writer.writerow(["Dimension", "Filtration (Birth)", "Filtration (Death)", "Simplex", "Merged Components"])
 
-            for birth_simplex, death_simplex in simplex_tree.persistence_pairs():
+        """ I commented the following out, because all I care about are the birth and death times of a given simplex."""
 
-                death_filtration = simplex_tree.filtration(death_simplex)  # Extract the correct filtration value
 
-                if len(birth_simplex) > 1: # The birth simplex are the vertices that contribute to the birth of a feature.
-                    birth_filtration = simplex_tree.filtration(birth_simplex)
-                else:
-                    birth_filtration = 0  # Handles unbounded features. This would happen for the 0-th components.
+        # output_csv_contributing_points_file = f"{csv_file_name_nocsv}_0_information.csv"
+        # print("working on" + output_csv_contributing_points_file)
+        # with open(output_csv_contributing_points_file, "w", newline="") as f:
+        #     writer = csv.writer(f)
+        #     writer.writerow(["Dimension", "Filtration (Birth)", "Filtration (Death)", "Simplex", "Merged Components"])
 
-                simplex_indices = tuple(sorted(death_simplex))
+        #     for birth_simplex, death_simplex in simplex_tree.persistence_pairs():
 
-                # BLah blah lbllah 
+        #         death_filtration = simplex_tree.filtration(death_simplex)  # Extract the correct filtration value
+
+        #         if len(birth_simplex) > 1: # The birth simplex are the vertices that contribute to the birth of a feature.
+        #             birth_filtration = simplex_tree.filtration(birth_simplex)
+        #         else:
+        #             birth_filtration = 0  # Handles unbounded features. This would happen for the 0-th components.
+
+        #         simplex_indices = tuple(sorted(death_simplex))
+
+            #     # BLah blah lbllah 
                 
-                if len(simplex_indices) == 1:  # 0D feature (single point)
-                    writer.writerow([0, birth_filtration, death_filtration, simplex_indices, "N/A"])
-                else:  # 1D or higher feature
-                    if len(simplex_indices) == 2:  # j-th simplex causing component merge
-                        p1, p2 = simplex_indices
-                        old_comp, new_comp = uf.union(p1, p2)
-                        if old_comp is not None:
-                            merged_component = f"Component {uf.components.get(new_comp, old_comp)} merged with {uf.components.get(old_comp, new_comp)}"
-                            # Ensure old_comp and new_comp exist in the dictionary before accessing their sizes
-                            size_old = len(uf.components.get(old_comp, []))
-                            size_new = len(uf.components.get(new_comp, []))
+            #     if len(simplex_indices) == 1:  # 0D feature (single point)
+            #         writer.writerow([0, birth_filtration, death_filtration, simplex_indices, "N/A"])
+            #     else:  # 1D or higher feature
+            #         if len(simplex_indices) == 2:  # j-th simplex causing component merge
+            #             p1, p2 = simplex_indices
+            #             old_comp, new_comp = uf.union(p1, p2)
+            #             if old_comp is not None:
+            #                 merged_component = f"Component {uf.components.get(new_comp, old_comp)} merged with {uf.components.get(old_comp, new_comp)}"
+            #                 # Ensure old_comp and new_comp exist in the dictionary before accessing their sizes
+            #                 size_old = len(uf.components.get(old_comp, []))
+            #                 size_new = len(uf.components.get(new_comp, []))
 
-                            # Choose the larger component
-                            if size_new > size_old:
-                                components = uf.components.get(new_comp,old_comp)
-                            else:
-                                components = uf.components.get(old_comp,new_comp)
-                            writer.writerow([len(simplex_indices)-2, birth_filtration, death_filtration, simplex_indices, components])
+            #                 # Choose the larger component
+            #                 if size_new > size_old:
+            #                     components = uf.components.get(new_comp,old_comp)
+            #                 else:
+            #                     components = uf.components.get(old_comp,new_comp)
+            #                 writer.writerow([len(simplex_indices)-2, birth_filtration, death_filtration, simplex_indices, components])
 
-            print(f"All bar information saved to {output_csv_contributing_points_file}")
+            # print(f"All bar information saved to {output_csv_contributing_points_file}")
+
+            """If I need it , uncomment to here from above."""
+
 
         # The below piece does just the times for all the features.
         output_csv_file = f"{csv_file_name_nocsv}_all_dimensions_simple.csv"
@@ -149,13 +156,13 @@ def construct_calculate(data_array, max_dimension, max_edge_length,csv_file_name
 a function to compute the persistence barcodes
 """        
         
-def persistence_barcodes(persistence, output_file):    
-        # Visualize persistence barcode
-        f, ax = plt.subplots(figsize=(10, 10))
-        #plot the persistence barcodes
-        gudhi.plot_persistence_barcode(persistence, axes=ax, legend=True)
-        plt.savefig(output_file)
-        print(f"Persistence barcode saved as {output_file}")     
+# def persistence_barcodes(persistence, output_file):    
+#         # Visualize persistence barcode
+#         f, ax = plt.subplots(figsize=(10, 10))
+#         #plot the persistence barcodes
+#         gudhi.plot_persistence_barcode(persistence, axes=ax, legend=True)
+#         plt.savefig(output_file)
+#         print(f"Persistence barcode saved as {output_file}")     
 
 """
 a function to compute the persistence graph

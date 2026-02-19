@@ -16,7 +16,7 @@ Notes on this file:
 Note to self:
 Ideal Pipeline:
  - The data is something (csv, png, jpeg, html, carrier pigeon, idk). (DONE)
- - We need to first get the wavelet approximation of the EKG.
+ - We need to first get the wavelet approximation of the EKG. (DONE)
  - Then hand the wavelet to SWE
  - When the wavelet has been converted into a point cloud in R^{M+1},
     persistent homol. is calcuated on this point cloud.
@@ -67,6 +67,7 @@ while cycle < num_patients:
     "Step 2: Wavelet Approximation"
 
     # For this you need to cycle through the different leads, because wa only takes in one lead at a time.
+    #  I am going to have to cycle through all of the leads for steps 2, 3, 4, and 5. So I might as well do them one lead at a time.
 
     leads_to_cycle_through = 0
 
@@ -83,24 +84,14 @@ while cycle < num_patients:
 
     "Step 4: Persistent Homology of SWE point cloud"
 
-    # The following three lines are for naming purposes. I don't have steps 2 and 3 done, so the naming may change.
-    # output_file_barcodes = f"Persistence_Barcode_{dataset.replace(".csv",".png").replace("TDA-code-main NEW/","")}"
-    # output_file_graph = f"Persistence_Diagram_{dataset.replace(".csv",".png").replace("TDA-code-main NEW/","")}"
-    # output_csv_name = f"Persistence_Info_{dataset.replace("TDA-code-main NEW/","")}"
+    output_csv_name = f"{naming_things}_persistence_info"
+    output_file_graph = f"{naming_things}_persistence_diagram"
 
     max_dimension = 3
     max_edge_length = 3
 
     # Call the function with the specified parameters
     persistence = cc.construct_calculate("normalized_data", max_dimension, max_edge_length, output_csv_name)
-
-    # We probably don't want to look at the barcode, because there is no bottleneck distance for barcodes, but there is for the diagrams.
-    # # Now compute the persistence barcodes or graph 
-    # try:
-    #     cc.persistence_barcodes(persistence, output_file_barcodes)
-    # except Exception as e:
-    #     print(f"An error occurred during the persistence barcodes: {e}")
-
 
     try:
         cc.persistence_graph(persistence, output_file_graph)
