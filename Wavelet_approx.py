@@ -78,7 +78,7 @@ def plot_wavelet(ptf, lead_s, wavelet, level_decomp, naming_things, sample_num =
     pyplt.plot(values)
     pyplt.show()
 
-    return pyplt.show()
+    return pyplt.show() 
 
 """
 The following function wavelet_coeffs gets the coefficients of the wavelet approximation.
@@ -103,6 +103,38 @@ def wavelet_coeffs(ptf, lead_s, wavelet, level_decomp):
     coeffs = pywt.wavedec(signal, wavelet=wavelet, level=level_decomp)
 
     return coeffs
+
+"""
+The following function takes in the same as the functions before it, but returns the coefficients as 
+    part of the graphs with the original signal and the first approximation of that signal.
+"""
+
+def plot_wavelet_w_coeffs(ptf, lead_s, wavelet, level_decomp):
+    
+    wavelet = pywt.Wavelet(wavelet)
+
+    record = wfdb.rdrecord(ptf)
+    num_lead = len(lead_s)
+    signal = vekg.get_EKG_leads(ptf, lead_s)
+    t = np.linspace(0,len(signal), len(signal))
+
+    coeffs = pywt.wavedec(signal, wavelet, level = level_decomp)
+
+    l = level_decomp + 2
+
+    # Plot the original signal and wavelet coefficients
+    pyplt.figure(figsize=(10, 8))
+    pyplt.subplot(l, 1, 1) # This is the first of l plots in the first column
+    pyplt.plot(t, signal)
+    pyplt.title("Original Signal")
+
+    for i, coeff in enumerate(coeffs):
+        pyplt.subplot(l, 1, i + 2) # (num of plots, how many per column, cycling through the coeff.)
+        pyplt.plot(coeff)
+        pyplt.title(f"Wavelet Coefficients - Level {i}")
+
+    pyplt.tight_layout()
+    pyplt.show()
 
 """
 Now I want a function that will be our function we use in the SWE.
