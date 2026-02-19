@@ -66,8 +66,14 @@ while cycle < num_patients:
 
     "Step 2: Wavelet Approximation"
 
-    # Ideally for each of these pieces you would have a separate file that has the functions that you would import in the preamble.
+    # For this you need to cycle through the different leads, because wa only takes in one lead at a time.
 
+    leads_to_cycle_through = 0
+
+    while leads_to_cycle_through < len(lead_s):
+        wa.stuff stuff stuff
+        leads_to_cycle_through += 1
+    
 
     "Step 3: SWE"
 
