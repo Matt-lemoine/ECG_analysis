@@ -1,26 +1,15 @@
 """
-Analysis of Electrocardiography and its relation this with persistent homology and sliding window embeddings.
+Analysis of Electrocardiography and its properties using the persistent homology of its sliding window embedding.
 
 Created by Matthew Lemoine
 Initialization: Feb. 6, 2026
-Finalization: --- --, 2026
+Finalization: Feb. , 2026
 """
 
 """
 Notes on this file:
     In this file, we begin by taking in a list of the patient numbers and putting them in a list called "all_folder_names".
     Then the while loop cycles through all the patients to calculate the needed things.
-"""
-
-"""
-Note to self:
-Ideal Pipeline:
- - The data is something (csv, png, jpeg, html, carrier pigeon, idk). (DONE)
- - We need to first get the wavelet approximation of the EKG. (DONE)
- - Then hand the wavelet to SWE
- - When the wavelet has been converted into a point cloud in R^{M+1},
-    persistent homol. is calcuated on this point cloud.
- - Analysis is performed on the pers. homol. of the point cloud of the wavelet approximation of the EKG.
 """
 
 import numpy as np
