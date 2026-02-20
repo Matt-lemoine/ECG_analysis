@@ -79,19 +79,24 @@ while cycle < num_patients:
 
     "Step 3: SWE"
 
+    tau = ???
+    M = ???
 
+    projected_points = swe.get_points_nd(ptf, lead_s, wavelet, level_decomp, tau, M)
 
+    # n is the dimension that you have projected into.
+    n = M+1
 
     "Step 4: Persistent Homology of SWE point cloud"
 
     output_csv_name = f"{naming_things}_persistence_info"
     output_file_graph = f"{naming_things}_persistence_diagram"
 
-    max_dimension = 3
-    max_edge_length = 3
+    max_dimension = n-1
+    max_edge_length = 1
 
     # Call the function with the specified parameters
-    persistence = cc.construct_calculate("normalized_data", max_dimension, max_edge_length, output_csv_name)
+    persistence = cc.construct_calculate(projected_points, max_dimension, max_edge_length, output_csv_name)
 
     try:
         cc.persistence_graph(persistence, output_file_graph)

@@ -1,5 +1,3 @@
-# This file is for the SWE piece of things.
-
 import numpy as np
 import matplotlib as plt
 import Visualize_EKG as vekg
@@ -39,7 +37,7 @@ M tells you which dimension to push to. (e.g. M = 2  ==> R^3)
 tau tells you about what's happening in the periodicity of your signal. 
 """
 
-def SWE_get_points_nd(ptf, lead_s, wavelet, level_decomp, tau, M):
+def get_points_nd(ptf, lead_s, wavelet, level_decomp, tau, M):
 
     signal = vekg.get_EKG_leads(ptf, lead_s)
 
@@ -66,20 +64,20 @@ def SWE_get_points_nd(ptf, lead_s, wavelet, level_decomp, tau, M):
 """
 The following code will return a 3d plot of the projected wavelet. Here we fix M = 2.
 """
-def SWE_plot_3d(ptf, lead_s, wavelet, level_decomp, tau, naming_things):
+def plot_3d(ptf, lead_s, wavelet, level_decomp, tau, naming_things):
     M = 2
 
-    projected_points = SWE_get_points_nd(ptf, lead_s, wavelet, level_decomp, tau, M)
+    projected_points = get_points_nd(ptf, lead_s, wavelet, level_decomp, tau, M)
     
     return plot_3d(projected_points)
 
 """
 The following code will return a 3d plot of the projected wavelet. Here we fix M = 1.
 """
-def SWE_plot_2d(ptf, lead_s, wavelet, level_decomp, tau, naming_things):
+def plot_2d(ptf, lead_s, wavelet, level_decomp, tau, naming_things):
     M = 1
 
-    projected_points = SWE_get_points_nd(ptf, lead_s, wavelet, level_decomp, tau, M)
+    projected_points = get_points_nd(ptf, lead_s, wavelet, level_decomp, tau, M)
     
     return plot_2d(projected_points)
 
@@ -90,7 +88,7 @@ After this function, you may want to plot them, if your M = 1,2.
 Use the plot_2d or plot_3d respectively.
 """
 
-def SWE_get_points_nd_TESTING(ptf, lead_s, wavelet, level_decomp, tau, M, sample_points):
+def get_points_nd_TESTING(ptf, lead_s, wavelet, level_decomp, tau, M, sample_points):
 
     signal = vekg.get_EKG_leads(ptf, lead_s)
 
