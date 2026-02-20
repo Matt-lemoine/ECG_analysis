@@ -32,6 +32,7 @@ from pathlib import Path
 
 import Visualize_EKG as vekg
 import Wavelet_approx as wa
+import SWE as swe
 import construct_comples as cc
 
 lead_s = ['V1', 'V2', 'V3'] # These are the ones we are interested in at first, because these are the known indicators of Brugada.
@@ -78,8 +79,7 @@ while cycle < num_patients:
 
     "Step 3: SWE"
 
-    # Under the folder that says Look At in Google Chrome there is a website for time-series-embedding implimented in python.
-    # The library used is called giotto-tda.
+
 
 
     "Step 4: Persistent Homology of SWE point cloud"
