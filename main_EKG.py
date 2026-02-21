@@ -105,7 +105,6 @@ while cycle < num_patients:
 
         print(f"Performed Sliding Window Embedding. Shape = {projected_points.shape}. Now moving to Persistent Homology.")
 
-        
         "Step 4: Persistent Homology of SWE point cloud"
 
         output_csv_name = f"{naming_things}_pers_info"
