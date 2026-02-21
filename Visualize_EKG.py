@@ -64,7 +64,7 @@ def get_EKG_leads(ptf, lead_s):
             positions.append(position)
         except:
             error_message = "You do not have the leads labeled correctly, refer to input information for how to input the leads."
-            return error_message
+            return print(error_message)
         i = i+1
 
     # Ok, so now you have the leads you want and the positions in the positions array.

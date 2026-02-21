@@ -53,7 +53,7 @@ def SWE_get_points_nd(ptf, lead_s, wavelet, level_decomp, tau, M):
             if p+j*tau > len(signal):
                 k = 0
             else:
-                k = wa.wavelet(ptf, lead_s, wavelet, level_decomp, p + j*tau)
+                k = wa.wavelet(ptf, lead_s, wavelet, level_decomp, p + j*tau)[0]
             point.append(k)
             j = j+1
         projected_points.append(point)
@@ -104,7 +104,7 @@ def SWE_get_points_nd_TESTING(ptf, lead_s, wavelet, level_decomp, tau, M, sample
             if p+j*tau > len(signal):
                 k = 0
             else:
-                k = wa.wavelet(ptf, lead_s, wavelet, level_decomp, p + j*tau)
+                k = wa.wavelet(ptf, lead_s, wavelet, level_decomp, p + j*tau)[0]
             point.append(k)
             j = j+1
         projected_points.append(point)
