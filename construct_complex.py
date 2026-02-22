@@ -9,7 +9,6 @@ This script is for the construction of the simplicial complex
 """
 
 import gudhi
-import pandas as pd
 import matplotlib.pyplot as plt
 plt.rcParams['text.usetex'] = False #so we do not get the LaTeX error
 

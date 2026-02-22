@@ -43,7 +43,6 @@ In the wfdb library, when you run __dict__['p_signal'], this return a numpy arra
 """
 
 import numpy as np
-import pandas as pd
 import matplotlib as plt
 import wfdb
 import csv

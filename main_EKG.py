@@ -18,7 +18,6 @@ Notes on this file:
 """
 
 import numpy as np
-import pandas as pd
 import matplotlib as plt
 import wfdb
 
@@ -73,7 +72,7 @@ while cycle < num_patients:
 
         ptf = f'Brugada_subset/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}' # This gets you to the patient. TESTING(REMOVE)
 
-        lead_in_cycle = [f'{lead_s[leads_to_cycle_through]}']
+        lead_in_cycle = [f'{lead_s[leads_to_cycle_through]}'] # This tells you which lead we are looking at.
         
         
         "Step 2: Wavelet Approximation"
@@ -99,7 +98,7 @@ while cycle < num_patients:
         tau = 0.5
         M = 2
 
-        projected_points = swe.SWE_get_points_nd_TESTING(ptf, lead_in_cycle, wavelet, level_decomp, tau, M, 300)  ## Remove the TESTING and the 300 when you get this part done.
+        projected_points = swe.SWE_get_points_nd_TESTING(ptf, lead_in_cycle, wavelet, level_decomp, tau, M, 200)  ## Remove the TESTING and the 300 when you get this part done.
 
         projected_points = np.array(projected_points)
 

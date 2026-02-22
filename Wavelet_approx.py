@@ -13,7 +13,6 @@ import pywt
 import numpy as np
 import matplotlib.pyplot as pyplt
 import wfdb
-import pandas as pd
 import matplotlib as plt
 import Visualize_EKG as vekg
 
