@@ -2,8 +2,7 @@
 Analysis of Electrocardiography and its properties using the persistent homology of its sliding window embedding.
 
 Created by Matthew Lemoine
-Initialization: Feb. 6, 2026
-Finalization: Feb. , 2026
+February 2026
 """
 
 """
@@ -53,7 +52,8 @@ cycle = 0
 
 while cycle < num_patients:
 
-    print(f"START looking at patient {all_folder_names[cycle]}.")
+    print(f"START looking at patient {all_folder_names[cycle]}")
+
     
     # All subsequent steps must be done one lead at a time, so we cycle through the specified leads.
 
@@ -61,7 +61,7 @@ while cycle < num_patients:
 
     while leads_to_cycle_through < len(lead_s):
 
-        print(f"Currently looking at lead {lead_s[leads_to_cycle_through]}.")
+        print(f"START looking at lead {lead_s[leads_to_cycle_through]}")
 
         naming_things = f'{all_folder_names[cycle]}_{lead_s[leads_to_cycle_through]}' # This is for labeling things. It calls the patient number and lead treating it as a str.
 
@@ -89,20 +89,21 @@ while cycle < num_patients:
         
         "Step 3: SWE"
 
-
-
-        """"I need to double check the len(signal) piece in the SWE_get_points_nd function, becuase right now it is breaking up your signal in one pieces."""
-
-
-
         tau = 0.5
         M = 2
+        breakup_interval_more = 1200 # This variable gives you the opportunity to breakup your sliding window embedding into more points to project up. (note: adds computation time.)
 
         projected_points = swe.SWE_get_points_nd(ptf, lead_in_cycle, wavelet, level_decomp, tau, M)
 
         projected_points = np.array(projected_points)
 
+        if M == 1:
+            swe.save_plot_2d(projected_points, naming_things)
+        elif M == 2:
+            swe.save_plot_3d(projected_points, naming_things)
+
         print(f"Performed Sliding Window Embedding. Shape = {projected_points.shape}. Now moving to Persistent Homology.")
+
 
         "Step 4: Persistent Homology of SWE point cloud"
 
@@ -120,7 +121,9 @@ while cycle < num_patients:
         except Exception as e:
             print(f"An error occurred during the persistence graph: {e}")
 
-        print("Persistence Calculated.")
+        print("Persistence Calculated")
+
+        print(f"DONE looking at lead {lead_s[leads_to_cycle_through]}")
 
         leads_to_cycle_through += 1
 
@@ -128,6 +131,6 @@ while cycle < num_patients:
     "Step 5: Analysis of Persistent Homology"
     # this is not done on the computer, as far as I know.
 
-    print(f"DONE looking at patient {all_folder_names[cycle]}.")
+    print(f"DONE looking at patient {all_folder_names[cycle]}")
 
     cycle = cycle + 1

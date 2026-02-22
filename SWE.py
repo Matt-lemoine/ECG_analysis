@@ -31,25 +31,59 @@ def plot_2d(projected_points):
 
     return pyplt.show()
 
+def save_plot_3d(projected_points, naming_things):
+    fig = pyplt.figure()
+    ax = fig.add_subplot(projection='3d')
+
+    for x,y,z in projected_points:
+        ax.scatter(x,y,z)
+
+    # Save the plot as an image file with the specified output file name
+    pyplt.savefig(naming_things)
+    
+    # Print a confirmation message that the persistence diagram was saved
+    print(f"Projected points saved as {naming_things}")
+
+
+def save_plot_2d(projected_points, naming_things):
+    fig = pyplt.figure()
+    ax = fig.add_subplot(projection='2d')
+
+    for x,y,z in projected_points:
+        ax.scatter(x,y)
+
+    # Save the plot as an image file with the specified output file name
+    pyplt.savefig(naming_things)
+    
+    # Print a confirmation message that the persistence diagram was saved
+    print(f"Projected points saved as {naming_things}")
+
+
 """
 The following function will retrieve the desired points in whatever dimensional projection space you want.
 M tells you which dimension to push to. (e.g. M = 2  ==> R^3)
 tau tells you about what's happening in the periodicity of your signal. 
+The breakup_interval_more gives you the option to breakup your signal into smaller pieces (note that this will add computation time.)
 """
 
-def SWE_get_points_nd(ptf, lead_s, wavelet, level_decomp, tau, M):
+def SWE_get_points_nd(ptf, lead_s, wavelet, level_decomp, tau, M, breakup_interval_more = None):
 
     signal = vekg.get_EKG_leads(ptf, lead_s)
 
+    if breakup_interval_more is None:
+        bim = len(signal)
+    else:
+        bim = breakup_interval_more
+
     projected_points = []
-    points_in_interval = np.linspace(0, len(signal), len(signal))
+    points_in_interval = np.linspace(0, len(signal), bim)
 
     i = 0
-    while i < len(signal):
+    while i < bim:
         p = points_in_interval[i]
         point = []
         j = 0
-        while j <= M: # if t > 1200 k = 0; else: k = blah blah
+        while j <= M: # This takes care of values outside of our interval.
             if p+j*tau > len(signal):
                 k = 0
             else:
@@ -88,19 +122,24 @@ After this function, you may want to plot them, if your M = 1,2.
 Use the plot_2d or plot_3d respectively.
 """
 
-def SWE_get_points_nd_TESTING(ptf, lead_s, wavelet, level_decomp, tau, M, sample_points):
+def SWE_get_points_nd_TESTING(ptf, lead_s, wavelet, level_decomp, tau, M, sample_points, breakup_interval_more = None):
 
     signal = vekg.get_EKG_leads(ptf, lead_s)
 
+    if breakup_interval_more is None:
+        bim = len(signal)
+    else:
+        bim = breakup_interval_more
+
     projected_points = []
-    points_in_interval = np.linspace(0, len(signal), len(signal))
+    points_in_interval = np.linspace(0, len(signal), bim)
 
     i = 0
     while i < sample_points:
         p = points_in_interval[i]
         point = []
         j = 0
-        while j <= M: # if t > 1200 k = 0; else: k = blah blah
+        while j <= M: # This takes care of values outside of our interval.
             if p+j*tau > len(signal):
                 k = 0
             else:
