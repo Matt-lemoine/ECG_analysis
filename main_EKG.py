@@ -53,9 +53,7 @@ cycle = 0
 
 while cycle < num_patients:
 
-    print(f"Currently looking at Patient {all_folder_names[cycle]}.")
-
-    naming_things = f'{all_folder_names[cycle]}' # This is for labeling things. It calls the patient number treating it as a str.
+    print(f"START looking at patient {all_folder_names[cycle]}.")
     
     # All subsequent steps must be done one lead at a time, so we cycle through the specified leads.
 
@@ -65,6 +63,8 @@ while cycle < num_patients:
 
         print(f"Currently looking at lead {lead_s[leads_to_cycle_through]}.")
 
+        naming_things = f'{all_folder_names[cycle]}_{lead_s[leads_to_cycle_through]}' # This is for labeling things. It calls the patient number and lead treating it as a str.
+
 
         "Step 1: Point to the data"
 
@@ -72,7 +72,7 @@ while cycle < num_patients:
 
         ptf = f'Brugada_subset/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}' # This gets you to the patient. TESTING(REMOVE)
 
-        lead_in_cycle = [f'{lead_s[leads_to_cycle_through]}'] # This tells you which lead we are looking at.
+        lead_in_cycle = [f'{lead_s[leads_to_cycle_through]}'] # This records which lead we are looking at.
         
         
         "Step 2: Wavelet Approximation"
@@ -98,7 +98,7 @@ while cycle < num_patients:
         tau = 0.5
         M = 2
 
-        projected_points = swe.SWE_get_points_nd_TESTING(ptf, lead_in_cycle, wavelet, level_decomp, tau, M, 200)  ## Remove the TESTING and the 300 when you get this part done.
+        projected_points = swe.SWE_get_points_nd(ptf, lead_in_cycle, wavelet, level_decomp, tau, M)
 
         projected_points = np.array(projected_points)
 
@@ -127,5 +127,7 @@ while cycle < num_patients:
 
     "Step 5: Analysis of Persistent Homology"
     # this is not done on the computer, as far as I know.
+
+    print(f"DONE looking at patient {all_folder_names[cycle]}.")
 
     cycle = cycle + 1
