@@ -49,7 +49,7 @@ cycle = 0
 
 while cycle < num_patients:
 
-    print(f"START looking at patient {all_folder_names[cycle]}")
+    print(f"****** START ****** looking at patient {all_folder_names[cycle]}")
 
     
     # All subsequent steps must be done one lead at a time, so we cycle through the specified leads.
@@ -120,7 +120,7 @@ while cycle < num_patients:
 
         print("Persistence Calculated")
 
-        print(f"DONE looking at lead {lead_s[leads_to_cycle_through]}")
+        print(f"END looking at lead {lead_s[leads_to_cycle_through]}")
 
         leads_to_cycle_through += 1
 
@@ -128,6 +128,6 @@ while cycle < num_patients:
     "Step 5: Analysis of Persistent Homology"
     # this is not done on the computer, as far as I know.
 
-    print(f"DONE looking at patient {all_folder_names[cycle]}")
+    print(f"****** END ****** looking at patient {all_folder_names[cycle]}")
 
     cycle = cycle + 1
