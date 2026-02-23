@@ -33,7 +33,7 @@ lead_s = ['V1', 'V2', 'V3'] # These are the ones we are interested in at first, 
 
 # get_to_files = Path('./Brugada_dataset/files') ## UNCOMMENT THIS LATER
 
-get_to_files = Path('./Brugada_subset/files') ## This is for TESTING (REMOVE).
+get_to_files = Path('./2_23_subset/files') ## This is for TESTING (REMOVE).
 
 all_folder_names = []
 
@@ -41,10 +41,7 @@ for subdir in get_to_files.iterdir():
     if subdir.is_dir():
         all_folder_names.append(subdir.name)
 
-# num_patients = len(all_folder_names) ## UNCOMMENT THIS LATER
-
-num_patients = 1 ## This is for TESTING (REMOVE). THIS WILL ONLY DO THE FIRST DUDE IN THE FOLDERS.
-
+num_patients = len(all_folder_names)
 
 cycle = 0
 
