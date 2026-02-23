@@ -1,8 +1,10 @@
 import numpy as np
 import matplotlib as plt
-import Visualize_EKG as vekg
 import wfdb
 import matplotlib.pyplot as pyplt
+
+import Visualize_EKG as vekg
+import Normalize_EKG as nekg
 import Wavelet_approx as wa
 
 """

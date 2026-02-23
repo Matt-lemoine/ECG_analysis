@@ -23,6 +23,7 @@ import wfdb
 from pathlib import Path
 
 import Visualize_EKG as vekg
+import Normalize_EKG as nekg
 import Wavelet_approx as wa
 import SWE as swe
 import construct_complex as cc
@@ -70,6 +71,13 @@ while cycle < num_patients:
         ptf = f'Brugada_subset/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}' # This gets you to the patient. TESTING(REMOVE)
 
         lead_in_cycle = [f'{lead_s[leads_to_cycle_through]}'] # This records which lead we are looking at.
+
+        
+        "Step 2: Normalize EKG signal"
+
+        bpm = 60 # This is the normalized bpm that we care about for all our signals.
+
+
         
         
         "Step 2: Wavelet Approximation"

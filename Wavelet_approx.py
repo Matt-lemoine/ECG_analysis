@@ -14,7 +14,9 @@ import numpy as np
 import matplotlib.pyplot as pyplt
 import wfdb
 import matplotlib as plt
+
 import Visualize_EKG as vekg
+import Normalize_EKG as nekg
 
 """
 What do I want from this file?
