@@ -42,7 +42,7 @@ def save_plot_3d(projected_points, naming_things):
     pyplt.savefig(naming_things)
     
     # Print a confirmation message that the persistence diagram was saved
-    print(f"Projected points saved as {naming_things}")
+    print(f"Projected points saved as {naming_things}.png")
 
 
 def save_plot_2d(projected_points, naming_things):
