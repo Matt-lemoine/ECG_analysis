@@ -114,7 +114,7 @@ def plot_wavelet_w_coeffs(ptf, lead_s, wavelet, level_decomp):
 
     num_lead = len(lead_s)
     signal = vekg.get_EKG_leads(ptf, lead_s)
-    t = np.linspace(0,len(signal), len(signal))
+    t = np.arange(0,len(signal), 1)
 
     coeffs = pywt.wavedec(signal, wavelet, level = level_decomp)
 
