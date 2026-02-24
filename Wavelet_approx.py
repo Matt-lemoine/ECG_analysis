@@ -38,7 +38,6 @@ def plot_wavelet(ptf, lead_s, wavelet, level_decomp, naming_things, sample_num =
 
     wavelet = pywt.Wavelet(wavelet)
 
-    record = wfdb.rdrecord(ptf)
     num_lead = len(lead_s)
 
     try:
@@ -92,7 +91,6 @@ def wavelet_coeffs(ptf, lead_s, wavelet, level_decomp):
 
     wavelet = pywt.Wavelet(wavelet)
 
-    record = wfdb.rdrecord(ptf)
     num_lead = len(lead_s)
 
     try:
@@ -114,7 +112,6 @@ def plot_wavelet_w_coeffs(ptf, lead_s, wavelet, level_decomp):
     
     wavelet = pywt.Wavelet(wavelet)
 
-    record = wfdb.rdrecord(ptf)
     num_lead = len(lead_s)
     signal = vekg.get_EKG_leads(ptf, lead_s)
     t = np.linspace(0,len(signal), len(signal))
@@ -150,7 +147,6 @@ def wavelet(ptf, lead_s, wavelet, level_decomp, t):
 
     wavelet = pywt.Wavelet(wavelet)
 
-    record = wfdb.rdrecord(ptf)
     num_lead = len(lead_s)
 
     try:
