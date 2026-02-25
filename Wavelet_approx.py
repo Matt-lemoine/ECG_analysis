@@ -25,6 +25,7 @@ For the following function plot_wavelet:
     level_decomp should be about 4.
     sample_num should be greater than or equal to the len(signal).
     naming
+    we also normalize our signals inside each of these functions.
 """
 
 def plot_wavelet(ptf, lead_s, wavelet, level_decomp, naming_things, sample_num = None):
@@ -33,11 +34,11 @@ def plot_wavelet(ptf, lead_s, wavelet, level_decomp, naming_things, sample_num =
 
     num_lead = len(lead_s)
 
-    try:
-        signal = vekg.get_EKG_leads(ptf, lead_s)
-    except num_lead != 1:
-        error_message = "You can only input one lead at a time."
-        return error_message
+    if num_lead == 1:
+        signal = nekg.trim_EKG(ptf, lead_s)
+    else:
+        error = 'You can only import one lead at a time for plot_wavelet.'
+        return print(error)
     
     coeffs = pywt.wavedec(signal, wavelet=wavelet, level=level_decomp)
 
@@ -86,11 +87,11 @@ def wavelet_coeffs(ptf, lead_s, wavelet, level_decomp):
 
     num_lead = len(lead_s)
 
-    try:
-        signal = vekg.get_EKG_leads(ptf, lead_s)
-    except num_lead != 1:
-        error_message = "You can only input one lead at a time."
-        return error_message
+    if num_lead == 1:
+        signal = nekg.trim_EKG(ptf, lead_s)
+    else:
+        error = 'You can only import one lead at a time for wavelet_coeffs.'
+        return print(error)
     
     coeffs = pywt.wavedec(signal, wavelet=wavelet, level=level_decomp)
 
@@ -106,7 +107,7 @@ def plot_wavelet_w_coeffs(ptf, lead_s, wavelet, level_decomp):
     wavelet = pywt.Wavelet(wavelet)
 
     num_lead = len(lead_s)
-    signal = vekg.get_EKG_leads(ptf, lead_s)
+    signal = nekg.trim_EKG(ptf, lead_s)
     t = np.arange(0,len(signal), 1)
 
     coeffs = pywt.wavedec(signal, wavelet, level = level_decomp)
@@ -142,11 +143,11 @@ def wavelet(ptf, lead_s, wavelet, level_decomp, t):
 
     num_lead = len(lead_s)
 
-    try:
-        signal = vekg.get_EKG_leads(ptf, lead_s)
-    except num_lead != 1:
-        error_message = "You can only input one lead at a time."
-        return error_message
+    if num_lead == 1:
+        signal = nekg.trim_EKG(ptf, lead_s)
+    else:
+        error = 'You can only import one lead at a time for wavelet.'
+        return print(error)
     
     coeffs = pywt.wavedec(signal, wavelet=wavelet, level=level_decomp)
 

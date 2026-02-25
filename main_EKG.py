@@ -75,10 +75,10 @@ while cycle < num_patients:
         
         "Step 2: Normalize EKG signal"
 
-        bpm = 60 # This is the normalized bpm that we care about for all our signals.
+        # There is not an option to adjust this aspect of the code. This is a fixed thing that you have to edit in the Normalize_EKG.py file.
+        # To edit the normalization, go to the Normalize_EKG.py file. Then go to the trim_EKG function and edit the num_peaks variable.
+        # Original choice is  6  peaks for normalizing. This means that in our original signal, we pick out the 6 middle-most peaks in our EKG.
 
-
-        
         
         "Step 3: Wavelet Approximation"
 
@@ -96,7 +96,7 @@ while cycle < num_patients:
 
         tau = 0.5
         M = 2
-        breakup_interval_more = 1200 # This variable gives you the opportunity to breakup your sliding window embedding into more points to project up. (note: adds computation time.)
+        breakup_interval_more = 6 # This variable gives you the opportunity to breakup your sliding window embedding into more points to project up. (note: adds computation time.)
 
         projected_points = swe.SWE_get_points_nd(ptf, lead_in_cycle, wavelet, level_decomp, tau, M)
 

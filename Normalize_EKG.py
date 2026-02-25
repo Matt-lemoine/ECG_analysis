@@ -1,7 +1,6 @@
 """
-This file is to normalize the EKG signal to:
-60 bpm,
-and extract about 8 peaks.
+This file is to normalize the EKG signal. The functions here help normalize you EKGs so that they tau and M that are used 
+    can be standard across all the EKGs we want to analyze.
 """
 
 import numpy as np
@@ -11,28 +10,10 @@ import csv
 
 import Visualize_EKG as vekg
 
-# You will want an input to be the normalization frequency.
-# Big question: How do you stretch out or shrink down a signal to fit in xx bpm?
-
 """
-The following function assumes only one lead at a time, so you will have to cycle through this function
-    later to find specific valleys for different leads.
-
-    The following function finds all the places in the single lead we are looking at, where the mV dips
-    near -1. This happens when the heart is re-regulating itself after a contraction of the cardiac muscles. (I need to research what is happening here and why it goes to -1.)
-
-    When we find the valleys of our EKG, then we can trim the EKG to have only a few of the peaks, and normalize the EKG.
-
-
-
-
-
-     ISSUE::: There is an issue with a possible misreading where the valley picks up slightly for one centisecond, and causes a valley in the valley. I need to do something that says if two entries are within 50 or so, throw one of them out. 
-
-
-
-
-
+In the following function (find_valleys), we are looking for places where the signal dips down toward -1 mV. Because we are looking for places 
+    where our signal dips down, we are only looking at one lead at a time. Furthermore, this function only takes in leads V1, V2, and V3. This
+    will help us be able to trim down our EKG signals so that we can normalize our signals.
 """
 
 def find_valleys(ptf, lead):
@@ -91,29 +72,19 @@ def find_valleys(ptf, lead):
     return valleys
 
 """
-In the following code, we want to trim our EKG to a standard length so that heartbeat does effect our comparison.
-    We make a choice here to trim our EKG to the middle-most complete 8 peaks <--> we need to keep the middle-most 10 valleys.
+In the following function (trim_EKG), we take a given signal and a single lead that we are interested in and trim down the 
+    EKG signal to be the middle-most 6 peaks in our reading. This function only works for leads V1, V2, and V3. The num_peaks + 2
+    corresponds to num_valleys, because we want a valley on both sides of our middle-most num_peaks. (For example, if we are looking at
+    the middle-most 6 peaks, then we are looking at the 8 middle-most valleys.) 
 
-    So for example, if I want the middle most 8 complete peaks, then I need to keep one extra valley before and one valley after
-    the 8 peaks that I care about. So I need to keep track of the middle most 10 valleys.
-
-    Maybe I should do the middle most 6 peaks, and keep the middle most 8 valleys? I could run it with a few different options of num_valleys and then pick on that keeps everything nice and neat.
-
-    Notes on the if-else piece after 'num_valleys = len(valleys)':
-      You have to check that you have enough space to get the num_peaks you're looking for, so if num_valleys isn't small enough there's an error.
-      Then when you have the right num_peaks, you find how much you want to trim off the front and back of the signal by finding diff.
-      They we make an assumption that we want the middle-most part of the signal, and we trim more off the back if there is not an even number
-      of peaks and valleys. And vall is the trimmed signal.
-
-trim_EKG only works for V1-V3. I need to adjust it to work for V4-V6.
+    We make the assumption that if our signal is not even, then we will trim more off the end of the signal than the beginning. The if-else piece
+    at the end of this function finds how much to trim off the front/back and returns the valleys that are in our trimmed signal. Then after this 
+    if-else piece we perform the trimming and get our trimmed signal.
 """
 
-def trim_EKG(ptf, lead, num_peaks):
+def trim_EKG(ptf, lead):
 
-    # For now num_peaks is a variable to be entered in, but eventually I would like to pick a fixed num_peaks, but I'm not sure which is the most appropriate num_peaks to pick.
-    # When you pick the num_peaks, uncomment the following piece of the code and take out the variable num_peaks.
-
-    # num_peaks = xyz
+    num_peaks = 6  # To edit the normalized num_peaks, edit here.
 
     lenlead = len(lead)
 
@@ -134,19 +105,24 @@ def trim_EKG(ptf, lead, num_peaks):
         front_trim = diff // 2
         vall = valleys[front_trim - 1 : front_trim + num_peaks + 1]
 
-    new_range = np.arange(min(vall), max(vall)+1, 1) # This tells you the range of the trimmed ekg.
+    new_range = np.arange(min(vall), max(vall)+1, 1) # This picks out the new range of your signal
 
     trimmed_signal = signal[new_range] # This gets the trimmed ekg values from signal.
     
     return trimmed_signal
 
-def plot_og_trimmed_ekg(ptf, lead, num_peaks):
+"""
+The following function, looks at the original signal and the trimmed signal and plots them side by side. 
+    This function is more for debugging, but can be a helpful visual to see how we are trimming.
+"""
+
+def plot_og_trimmed_ekg(ptf, lead):
     
     signal = vekg.get_EKG_leads(ptf, lead)
 
     find_valleys(ptf, lead)
 
-    new_signal = trim_EKG(ptf, lead, num_peaks)
+    new_signal = trim_EKG(ptf, lead)
 
     pyplt.figure(figsize=(10, 8))
     pyplt.subplot(2, 1, 1) # This is the first of l plots in the first column
@@ -159,6 +135,9 @@ def plot_og_trimmed_ekg(ptf, lead, num_peaks):
 
     pyplt.tight_layout()
     pyplt.show()
+
+# You will want an input to be the normalization frequency.
+# Big question: How do you stretch out or shrink down a signal to fit in xx bpm?
 
 # def normalize(ptf, lead_s, bpm):
 

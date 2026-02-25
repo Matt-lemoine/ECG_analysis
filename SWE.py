@@ -34,6 +34,7 @@ def plot_2d(projected_points):
     return pyplt.show()
 
 def save_plot_3d(projected_points, naming_things):
+    
     fig = pyplt.figure()
     ax = fig.add_subplot(projection='3d')
 
@@ -48,6 +49,7 @@ def save_plot_3d(projected_points, naming_things):
 
 
 def save_plot_2d(projected_points, naming_things):
+    
     fig = pyplt.figure()
     ax = fig.add_subplot(projection='2d')
 
@@ -70,7 +72,7 @@ The breakup_interval_more gives you the option to breakup your signal into small
 
 def SWE_get_points_nd(ptf, lead_s, wavelet, level_decomp, tau, M, breakup_interval_more = None):
 
-    signal = vekg.get_EKG_leads(ptf, lead_s)
+    signal = nekg.get_EKG_leads(ptf, lead_s)
 
     if breakup_interval_more is None:
         bim = len(signal)
@@ -101,6 +103,7 @@ def SWE_get_points_nd(ptf, lead_s, wavelet, level_decomp, tau, M, breakup_interv
 The following code will return a 3d plot of the projected wavelet. Here we fix M = 2.
 """
 def SWE_plot_3d(ptf, lead_s, wavelet, level_decomp, tau, naming_things):
+    
     M = 2
 
     projected_points = get_points_nd(ptf, lead_s, wavelet, level_decomp, tau, M)
@@ -111,6 +114,7 @@ def SWE_plot_3d(ptf, lead_s, wavelet, level_decomp, tau, naming_things):
 The following code will return a 3d plot of the projected wavelet. Here we fix M = 1.
 """
 def SWE_plot_2d(ptf, lead_s, wavelet, level_decomp, tau, naming_things):
+    
     M = 1
 
     projected_points = get_points_nd(ptf, lead_s, wavelet, level_decomp, tau, M)
@@ -126,7 +130,7 @@ Use the plot_2d or plot_3d respectively.
 
 def SWE_get_points_nd_TESTING(ptf, lead_s, wavelet, level_decomp, tau, M, sample_points, breakup_interval_more = None):
 
-    signal = vekg.get_EKG_leads(ptf, lead_s)
+    signal = nekg.get_EKG_leads(ptf, lead_s)
 
     if breakup_interval_more is None:
         bim = len(signal)
