@@ -88,8 +88,11 @@ def SWE_get_points_nd(ptf, lead_s, wavelet, level_decomp, tau, M, breakup_interv
         point = []
         j = 0
         while j <= M: # This takes care of values outside of our interval.
-            if p+j*tau > len(signal):
-                k = 0
+            # if p+j*tau > len(signal): # This piece of the code says that if your sliding window extends beyond the scope of the signal, say it's 0.
+            #     k = 0
+            if p+j*tau > len(signal): # This piece of the code says that if your sliding window extends beyond the scope of the signal, loop back around to the beginning and use that.
+                x = p+j*tau - len(signal)
+                k = wa.wavelet(ptf, lead_s, wavelet, level_decomp, x)[0]
             else:
                 k = wa.wavelet(ptf, lead_s, wavelet, level_decomp, p + j*tau)[0]
             point.append(k)
@@ -146,8 +149,11 @@ def SWE_get_points_nd_TESTING(ptf, lead_s, wavelet, level_decomp, tau, M, sample
         point = []
         j = 0
         while j <= M: # This takes care of values outside of our interval.
-            if p+j*tau > len(signal):
-                k = 0
+            # if p+j*tau > len(signal): # This piece of the code says that if your sliding window extends beyond the scope of the signal, say it's 0.
+            #     k = 0
+            if p+j*tau > len(signal): # This piece of the code says that if your sliding window extends beyond the scope of the signal, loop back around to the beginning and use that.
+                x = p+j*tau - len(signal)
+                k = wa.wavelet(ptf, lead_s, wavelet, level_decomp, x)[0]
             else:
                 k = wa.wavelet(ptf, lead_s, wavelet, level_decomp, p + j*tau)[0]
             point.append(k)
