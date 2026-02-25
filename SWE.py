@@ -72,7 +72,7 @@ The breakup_interval_more gives you the option to breakup your signal into small
 
 def SWE_get_points_nd(ptf, lead_s, wavelet, level_decomp, tau, M, breakup_interval_more = None):
 
-    signal = nekg.get_EKG_leads(ptf, lead_s)
+    signal = nekg.trim_EKG(ptf, lead_s)
 
     if breakup_interval_more is None:
         bim = len(signal)
@@ -130,7 +130,7 @@ Use the plot_2d or plot_3d respectively.
 
 def SWE_get_points_nd_TESTING(ptf, lead_s, wavelet, level_decomp, tau, M, sample_points, breakup_interval_more = None):
 
-    signal = nekg.get_EKG_leads(ptf, lead_s)
+    signal = nekg.trim_EKG(ptf, lead_s)
 
     if breakup_interval_more is None:
         bim = len(signal)
