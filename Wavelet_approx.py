@@ -19,13 +19,6 @@ import Visualize_EKG as vekg
 import Normalize_EKG as nekg
 
 """
-What do I want from this file?
- - I want a function that returns the coefficients of the wavelets. (done)
- - I want a function that acts as my function for the approximation.
- - I want a plotting function that I can use as a check with the wavelet approximation. (done)
-"""
-
-"""
 For the following function plot_wavelet:
     The ptf is the path to file, the lead_s are the lead_s you are interested in.
     The wavelet for us should always be either db3 or db4.

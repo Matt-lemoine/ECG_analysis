@@ -98,6 +98,14 @@ In the following code, we want to trim our EKG to a standard length so that hear
     the 8 peaks that I care about. So I need to keep track of the middle most 10 valleys.
 
     Maybe I should do the middle most 6 peaks, and keep the middle most 8 valleys? I could run it with a few different options of num_valleys and then pick on that keeps everything nice and neat.
+
+    Notes on the if-else piece after 'num_valleys = len(valleys)':
+      You have to check that you have enough space to get the num_peaks you're looking for, so if num_valleys isn't small enough there's an error.
+      Then when you have the right num_peaks, you find how much you want to trim off the front and back of the signal by finding diff.
+      They we make an assumption that we want the middle-most part of the signal, and we trim more off the back if there is not an even number
+      of peaks and valleys. And vall is the trimmed signal.
+
+trim_EKG only works for V1-V3. I need to adjust it to work for V4-V6.
 """
 
 def trim_EKG(ptf, lead, num_peaks):
@@ -116,21 +124,15 @@ def trim_EKG(ptf, lead, num_peaks):
         return print(error)
 
     valleys = find_valleys(ptf, lead)
-
     num_valleys = len(valleys)
 
     if num_valleys < num_peaks + 2:
         error = f"You need at least two more peaks in your reading than your valleys in order to trim, you have {num_valleys} valleys"
         return print(error)
     else:
-        ## I make a choice that if you do not have an even number of peaks/valleys, then you take more off the end of the signal.
-
-        diff = num_valleys - num_peaks # this finds the number of valleys away from the peaks we want
-
-        front_trim = diff // 2 # This find the number of valleys in front to trim off picks the floor of the divided by 2 
-
-        vall = valleys[front_trim - 1 : front_trim + num_peaks + 1] # This picks out the range of values from where you trim off the front to the part where you trim off the end.
-            # vall is trimmed valleys
+        diff = num_valleys - num_peaks
+        front_trim = diff // 2
+        vall = valleys[front_trim - 1 : front_trim + num_peaks + 1]
 
     new_range = np.arange(min(vall), max(vall)+1, 1) # This tells you the range of the trimmed ekg.
 
@@ -138,9 +140,29 @@ def trim_EKG(ptf, lead, num_peaks):
     
     return trimmed_signal
 
+def plot_og_trimmed_ekg(ptf, lead, num_peaks):
+    
+    signal = vekg.get_EKG_leads(ptf, lead)
+
+    find_valleys(ptf, lead)
+
+    new_signal = trim_EKG(ptf, lead, num_peaks)
+
+    pyplt.figure(figsize=(10, 8))
+    pyplt.subplot(2, 1, 1) # This is the first of l plots in the first column
+    pyplt.plot(signal)
+    pyplt.title("Original Signal")
+
+    pyplt.subplot(2, 1, 2) # (num of plots, how many per column, cycling through the coeff.)
+    pyplt.plot(new_signal)
+    pyplt.title("Trimmed signal")
+
+    pyplt.tight_layout()
+    pyplt.show()
+
 # def normalize(ptf, lead_s, bpm):
 
-#     # For now bpm is a variable to be entered in, but eventually I would like to pick a fixed bpm, but I'm not sure which is the most appropriate bpm to pick.
-#     # When you pick the bpm, uncomment the following piece of the code and take out the variable bpm.
+    # For now bpm is a variable to be entered in, but eventually I would like to pick a fixed bpm, but I'm not sure which is the most appropriate bpm to pick.
+    # When you pick the bpm, uncomment the following piece of the code and take out the variable bpm.
 
-#     # bpm = xyz
+    # bpm = xyz

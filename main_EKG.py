@@ -80,7 +80,7 @@ while cycle < num_patients:
 
         
         
-        "Step 2: Wavelet Approximation"
+        "Step 3: Wavelet Approximation"
 
         # The wavelet I've been using is db3 with a level_decomp of 4.
 
@@ -92,7 +92,7 @@ while cycle < num_patients:
             # This function is built into the SWE file, but you still need to define the wavelet, and level_decomp.
 
         
-        "Step 3: SWE"
+        "Step 4: SWE"
 
         tau = 0.5
         M = 2
@@ -110,7 +110,7 @@ while cycle < num_patients:
         print(f"Performed Sliding Window Embedding. Shape = {projected_points.shape}. Now moving to Persistent Homology.")
 
 
-        "Step 4: Persistent Homology of SWE point cloud"
+        "Step 5: Persistent Homology of SWE point cloud"
 
         output_csv_name = f"{naming_things}_pers_info"
         output_file_graph = f"{naming_things}_pers_diagram"
@@ -133,7 +133,7 @@ while cycle < num_patients:
         leads_to_cycle_through += 1
 
 
-    "Step 5: Analysis of Persistent Homology"
+    "Step 6: Analysis of Persistent Homology"
     # this is not done on the computer, as far as I know.
 
     print(f"****** END ****** looking at patient {all_folder_names[cycle]}")
