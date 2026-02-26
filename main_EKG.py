@@ -27,6 +27,7 @@ import Normalize_EKG as nekg
 import Wavelet_approx as wa
 import SWE as swe
 import construct_complex as cc
+import jingle as jingle
 
 lead_s = ['V1', 'V2', 'V3'] # These are the ones we are interested in at first, because these are the known indicators of Brugada.
 
@@ -140,9 +141,4 @@ while cycle < num_patients:
 
     cycle = cycle + 1
 
-
-# So I can hear when the code is done  :)
-import winsound
-frequency = 2500  # Set Frequency To 2500 Hertz
-duration = 500  # Set Duration To 1000 ms == 1 second
-winsound.Beep(frequency, duration)
+jingle.done_jingle()
