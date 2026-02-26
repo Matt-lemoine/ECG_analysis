@@ -34,7 +34,7 @@ lead_s = ['V1', 'V2', 'V3'] # These are the ones we are interested in at first, 
 
 # get_to_files = Path('./Brugada_dataset/files') ## UNCOMMENT THIS LATER
 
-get_to_files = Path('./2_23_subset/files') ## This is for TESTING (REMOVE).
+get_to_files = Path('./Brugada_subset/files') ## This is for TESTING (REMOVE).
 
 all_folder_names = []
 
@@ -139,3 +139,10 @@ while cycle < num_patients:
     print(f"****** END ****** looking at patient {all_folder_names[cycle]}")
 
     cycle = cycle + 1
+
+
+# So I can hear when the code is done  :)
+import winsound
+frequency = 2500  # Set Frequency To 2500 Hertz
+duration = 500  # Set Duration To 1000 ms == 1 second
+winsound.Beep(frequency, duration)
