@@ -1,8 +1,3 @@
-"""
-This file is to normalize the EKG signal. The functions here help normalize you EKGs so that they tau and M that are used 
-    can be standard across all the EKGs we want to analyze.
-"""
-
 import numpy as np
 import matplotlib as plt
 import wfdb
@@ -10,17 +5,9 @@ import csv
 
 import Visualize_EKG as vekg
 
-"""
-In the following function (find_valleys), we are looking for places where the signal dips down toward -1 mV. Because we are looking for places 
-    where our signal dips down, we are only looking at one lead at a time. Furthermore, this function only takes in leads V1, V2, and V3. This
-    will help us be able to trim down our EKG signals so that we can normalize our signals.
-"""
-
 def find_valleys(ptf, lead):
 
-    lenlead = len(lead)
-
-    if lenlead == 1:
+    if len(lead) == 1:
         signal = vekg.get_EKG_leads(ptf, lead)
     else:
         error = 'You can only import one lead at a time for find_valleys.'
@@ -28,7 +15,7 @@ def find_valleys(ptf, lead):
 
     test_valleys = []
     i = 0
-    while i < len(signal): # This loop finds all the places where you have a low point
+    while i < len(signal): # This loop finds all the places where you have a local minimum.
         if i+1 == len(signal):
             break
         elif signal[i] <= signal[i+1] and signal[i] <= signal[i-1] and signal[i]<=0:
@@ -37,7 +24,7 @@ def find_valleys(ptf, lead):
         else:
             i +=1
     
-    # Ok now valleys is every place where within one i there is a hill, so it could be something like ..., 0.1, 0.09, 0.1, ...
+    # test_valleys is every local minimum in your EKG that is less than 0.
 
     average_test_valleys = np.mean(signal[test_valleys])
     std_test_valleys = np.std(signal[test_valleys])
@@ -52,8 +39,8 @@ def find_valleys(ptf, lead):
             i += 1
 
     # Now you need to double check that you didn't accedientally pick up an extra valley inside another valley.
-    # The 15 here is arbitrary, it corresponds to 15 centisecond in the ekg reading. It does not make sense that 
-        # there would be 2 valleys withing 15 centiseconds of each other.
+    # The 15 here is arbitrary, it corresponds to 15 centiseconds in the ekg reading. It does not make sense that 
+    #   there would be 2 valleys withing 15 centiseconds of each other.
 
     i = 0
     while i < len(valleys)-1:
@@ -71,24 +58,12 @@ def find_valleys(ptf, lead):
     
     return valleys
 
-"""
-In the following function (trim_EKG), we take a given signal and a single lead that we are interested in and trim down the 
-    EKG signal to be the middle-most 6 peaks in our reading. This function only works for leads V1, V2, and V3. The num_peaks + 2
-    corresponds to num_valleys, because we want a valley on both sides of our middle-most num_peaks. (For example, if we are looking at
-    the middle-most 6 peaks, then we are looking at the 8 middle-most valleys.) 
-
-    We make the assumption that if our signal is not even, then we will trim more off the end of the signal than the beginning. The if-else piece
-    at the end of this function finds how much to trim off the front/back and returns the valleys that are in our trimmed signal. Then after this 
-    if-else piece we perform the trimming and get our trimmed signal.
-"""
 
 def trim_EKG(ptf, lead):
 
     num_peaks = 6  # To edit the normalized num_peaks, edit here.
 
-    lenlead = len(lead)
-
-    if lenlead == 1:
+    if len(lead) == 1:
         signal = vekg.get_EKG_leads(ptf, lead)
     else:
         error = 'You can only import one lead at a time for trim_EKG.'
@@ -111,10 +86,6 @@ def trim_EKG(ptf, lead):
     
     return trimmed_signal
 
-"""
-The following function, looks at the original signal and the trimmed signal and plots them side by side. 
-    This function is more for debugging, but can be a helpful visual to see how we are trimming.
-"""
 
 def plot_og_trimmed_ekg(ptf, lead):
     
@@ -129,12 +100,13 @@ def plot_og_trimmed_ekg(ptf, lead):
     pyplt.plot(signal)
     pyplt.title("Original Signal")
 
-    pyplt.subplot(2, 1, 2) # (num of plots, how many per column, cycling through the coeff.)
+    pyplt.subplot(2, 1, 2)
     pyplt.plot(new_signal)
     pyplt.title("Trimmed signal")
 
     pyplt.tight_layout()
-    pyplt.show()
+    return pyplt.show()
+
 
 # You will want an input to be the normalization frequency.
 # Big question: How do you stretch out or shrink down a signal to fit in xx bpm?

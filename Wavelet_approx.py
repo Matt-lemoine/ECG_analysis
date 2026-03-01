@@ -1,8 +1,4 @@
 """
-In this code, we want to get a wavelet approximation of our EKG.
-"""
-
-"""
 Notes on the code here. The coeffs is what I want to be spit out by the def get_wave_eq. But I'm still not sure what this is telling us.
     I also do not understand why we are seeing so many different coefficients in the plt.show() stuff.
     But the fact that we are getting coefficients and plots is amazing. 
@@ -70,8 +66,6 @@ def plot_wavelet(ptf, lead_s, wavelet, level_decomp, naming_things, sample_num =
         i += add_how_much
 
     pyplt.plot(values)
-    pyplt.show()
-
     return pyplt.show() 
 
 """
@@ -126,7 +120,7 @@ def plot_wavelet_w_coeffs(ptf, lead_s, wavelet, level_decomp):
         pyplt.title(f"Wavelet Coefficients - Level {i}")
 
     pyplt.tight_layout()
-    pyplt.show()
+    return pyplt.show()
 
 """
 Now I want a function that will be our function we use in the SWE.
