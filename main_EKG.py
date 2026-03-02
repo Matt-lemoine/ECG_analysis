@@ -27,7 +27,6 @@ import Normalize_EKG as nekg
 import Wavelet_approx as wa
 import SWE as swe
 import construct_complex as cc
-import jingle as jingle
 
 lead_s = ['V1', 'V2', 'V3'] # These are the ones we are interested in at first, because these are the known indicators of Brugada Syndrome.
 
@@ -85,7 +84,7 @@ while cycle < num_patients: # Cycles through patients.
         "Step 4: SWE"
 
         tau = 0.5
-        M = 2
+        M = 3
         # breakup_interval_more = 'insert more than len(signal) to break up your signal into more pieces and get more points in SWE.'
 
         projected_points = np.array(swe.SWE_get_points_nd(ptf, lead_in_cycle, wavelet, level_decomp, tau, M))
@@ -103,7 +102,7 @@ while cycle < num_patients: # Cycles through patients.
         output_csv_name = f"{naming_things}_pers_info"
         output_file_graph = f"{naming_things}_pers_diagram"
 
-        max_dimension = M
+        max_dimension = 2
         max_edge_length = 1
 
         persistence = cc.construct_calculate(projected_points, max_dimension, max_edge_length, output_csv_name)
@@ -122,5 +121,3 @@ while cycle < num_patients: # Cycles through patients.
     print(f"****** END ****** looking at patient {all_folder_names[cycle]}")
 
     cycle += 1
-
-jingle.done_jingle()

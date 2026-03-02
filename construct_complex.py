@@ -31,9 +31,6 @@ def construct_calculate(data_array, max_dimension, max_edge_length, csv_file_nam
         persistence = simplex_tree.persistence()
         print("persistence computed")
 
-        n_points = len(data_array)
-        uf = UnionFind(n_points)
-
         csv_file_name_nocsv = csv_file_name.replace(".csv","")
 
         # The below piece does just the times for all the features and records it to a .

@@ -26,10 +26,9 @@ def plot_3d(projected_points):
 def plot_2d(projected_points):
 
     fig = pyplt.figure()
-    ax = fig.add_subplot(projection='2d')
 
     for x,y in projected_points:
-        ax.scatter(x,y)
+        pyplt.scatter(x,y)
 
     return pyplt.show()
 
@@ -50,10 +49,9 @@ def save_plot_3d(projected_points, naming_things):
 def save_plot_2d(projected_points, naming_things):
     
     fig = pyplt.figure()
-    ax = fig.add_subplot(projection='2d')
 
-    for x,y,z in projected_points:
-        ax.scatter(x,y)
+    for x,y in projected_points:
+        pyplt.scatter(x,y)
 
     # Save the plot as an image file with the specified output file name
     pyplt.savefig(naming_things)
