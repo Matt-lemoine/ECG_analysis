@@ -29,9 +29,7 @@ import SWE as swe
 import construct_complex as cc
 import jingle as jingle
 
-lead_s = ['V1', 'V2', 'V3'] # These are the ones we are interested in at first, because these are the known indicators of Brugada.
-
-# This little piece, gives you the ability to cycle through all the folders.
+lead_s = ['V1', 'V2', 'V3'] # These are the ones we are interested in at first, because these are the known indicators of Brugada Syndrome.
 
 # get_to_files = Path('./Brugada_dataset/files') ## UNCOMMENT THIS LATER
 
@@ -39,26 +37,21 @@ get_to_files = Path('./Brugada_subset/files') ## This is for TESTING (REMOVE).
 
 all_folder_names = []
 
-for subdir in get_to_files.iterdir():
+for subdir in get_to_files.iterdir(): # makes a list of all the files names (which are the patient numbers)
     if subdir.is_dir():
         all_folder_names.append(subdir.name)
 
 num_patients = len(all_folder_names)
 
-cycle = 0
-
 # This while loop cycles through all the folders and thus all the patients in the 'Brugada/files' file.
 
-while cycle < num_patients:
+cycle = 0
+while cycle < num_patients: # Cycles through patients.
 
     print(f"****** START ****** looking at patient {all_folder_names[cycle]}")
 
-    
-    # All subsequent steps must be done one lead at a time, so we cycle through the specified leads.
-
     leads_to_cycle_through = 0
-
-    while leads_to_cycle_through < len(lead_s):
+    while leads_to_cycle_through < len(lead_s): # Cycles through leads.
 
         print(f"START looking at lead {lead_s[leads_to_cycle_through]}")
 
@@ -76,32 +69,26 @@ while cycle < num_patients:
         
         "Step 2: Normalize EKG signal"
 
-        # There is not an option to adjust this aspect of the code. This is a fixed thing that you have to edit in the Normalize_EKG.py file.
-        # To edit the normalization, go to the Normalize_EKG.py file. Then go to the trim_EKG function and edit the num_peaks variable.
-        # Original choice is  6  peaks for normalizing. This means that in our original signal, we pick out the 6 middle-most peaks in our EKG.
+        # There is no option to edit this from main_EKG.py. To edit any aspect of the normalization you must go to Normalize_EKG.py and edit there.
+        # We have made a choice to pick out the middle-most 6 peaks from the EKG reading. This can be edited in the trim_EKG function.
 
         
         "Step 3: Wavelet Approximation"
 
-        # The wavelet I've been using is db3 with a level_decomp of 4.
+        # I have been using 'db3' and decomp = 4. 
+        # There is no option to edit more from main_EKG.py. To edit more aspects of the wavelet approximation you must go to wavelet_approx.py and edit there.
 
         wavelet = 'db3'
         level_decomp = 4
-
-        # The Wavelet function approximation at time t is called by the following function:
-            # wa. wavelet(ptf, lead_s, wavelet, level_decomp, t)
-            # This function is built into the SWE file, but you still need to define the wavelet, and level_decomp.
 
         
         "Step 4: SWE"
 
         tau = 0.5
         M = 2
-        breakup_interval_more = 6 # This variable gives you the opportunity to breakup your sliding window embedding into more points to project up. (note: adds computation time.)
+        # breakup_interval_more = 'insert more than len(signal) to break up your signal into more pieces and get more points in SWE.'
 
-        projected_points = swe.SWE_get_points_nd(ptf, lead_in_cycle, wavelet, level_decomp, tau, M)
-
-        projected_points = np.array(projected_points)
+        projected_points = np.array(swe.SWE_get_points_nd(ptf, lead_in_cycle, wavelet, level_decomp, tau, M))
 
         if M == 1:
             swe.save_plot_2d(projected_points, naming_things)
@@ -119,7 +106,6 @@ while cycle < num_patients:
         max_dimension = M
         max_edge_length = 1
 
-        # Call the function with the specified parameters
         persistence = cc.construct_calculate(projected_points, max_dimension, max_edge_length, output_csv_name)
 
         try:
@@ -133,12 +119,8 @@ while cycle < num_patients:
 
         leads_to_cycle_through += 1
 
-
-    "Step 6: Analysis of Persistent Homology"
-    # this is not done on the computer, as far as I know.
-
     print(f"****** END ****** looking at patient {all_folder_names[cycle]}")
 
-    cycle = cycle + 1
+    cycle += 1
 
 jingle.done_jingle()

@@ -8,7 +8,7 @@ import Normalize_EKG as nekg
 import Wavelet_approx as wa
 
 """
-Note the first 2 functions are strictly for plotting.
+Note the first functions are strictly for plotting.
 The next 3 functions will fix the sample of points taken to be the length of the signal. (for a signal of about 1000 points it will take about 100 seconds.)
 There is a function below them, that doesn't have a fixed sample points taken place. Use this to find a suitable tau.
 """
@@ -47,7 +47,6 @@ def save_plot_3d(projected_points, naming_things):
     # Print a confirmation message that the persistence diagram was saved
     print(f"Projected points saved as {naming_things}.png")
 
-
 def save_plot_2d(projected_points, naming_things):
     
     fig = pyplt.figure()
@@ -61,7 +60,6 @@ def save_plot_2d(projected_points, naming_things):
     
     # Print a confirmation message that the persistence diagram was saved
     print(f"Projected points saved as {naming_things}")
-
 
 """
 The following function will retrieve the desired points in whatever dimensional projection space you want.

@@ -28,9 +28,7 @@ def plot_wavelet(ptf, lead_s, wavelet, level_decomp, naming_things, sample_num =
 
     wavelet = pywt.Wavelet(wavelet)
 
-    num_lead = len(lead_s)
-
-    if num_lead == 1:
+    if len(lead_s) == 1:
         signal = nekg.trim_EKG(ptf, lead_s)
     else:
         error = 'You can only import one lead at a time for plot_wavelet.'
@@ -79,9 +77,7 @@ def wavelet_coeffs(ptf, lead_s, wavelet, level_decomp):
 
     wavelet = pywt.Wavelet(wavelet)
 
-    num_lead = len(lead_s)
-
-    if num_lead == 1:
+    if len(lead_s) == 1:
         signal = nekg.trim_EKG(ptf, lead_s)
     else:
         error = 'You can only import one lead at a time for wavelet_coeffs.'
@@ -100,8 +96,12 @@ def plot_wavelet_w_coeffs(ptf, lead_s, wavelet, level_decomp):
     
     wavelet = pywt.Wavelet(wavelet)
 
-    num_lead = len(lead_s)
-    signal = nekg.trim_EKG(ptf, lead_s)
+    if len(lead_s) == 1:
+        signal = nekg.trim_EKG(ptf, lead_s)
+    else:
+        error = 'You can only import one lead at a time for wavelet_coeffs.'
+        return print(error)
+
     t = np.arange(0,len(signal), 1)
 
     coeffs = pywt.wavedec(signal, wavelet, level = level_decomp)
@@ -135,9 +135,7 @@ def wavelet(ptf, lead_s, wavelet, level_decomp, t):
 
     wavelet = pywt.Wavelet(wavelet)
 
-    num_lead = len(lead_s)
-
-    if num_lead == 1:
+    if len(lead_s) == 1:
         signal = nekg.trim_EKG(ptf, lead_s)
     else:
         error = 'You can only import one lead at a time for wavelet.'

@@ -4,38 +4,6 @@ plt.rcParams['text.usetex'] = False #so we do not get the LaTeX error
 
 import csv
 
-
-class UnionFind:
-    def __init__(self, n):
-        self.parent = list(range(n))
-        self.rank = [0] * n
-        self.components = {i: {i} for i in range(n)}  # Initialize each point in its own component
-
-    def find(self, x):
-        if self.parent[x] != x:
-            self.parent[x] = self.find(self.parent[x])  # Path compression
-        return self.parent[x]
-
-    def union(self, x, y):
-        root_x = self.find(x)
-        root_y = self.find(y)
-        
-        if root_x != root_y:            
-            # Perform union
-            if self.rank[root_x] > self.rank[root_y]:
-                self.parent[root_y] = root_x
-                self.components[root_x].update(self.components[root_y])  # Merge the components
-                del self.components[root_y]
-            else:
-                self.parent[root_x] = root_y
-                self.components[root_y].update(self.components[root_x])  # Merge the components
-                del self.components[root_x]
-                if self.rank[root_x] == self.rank[root_y]:
-                    self.rank[root_y] += 1
-            return root_x, root_y
-        return None, None
-
-
 def construct_calculate(data_array, max_dimension, max_edge_length, csv_file_name):
     """
     Constructs a Vietoris-Rips complex, computes persistence, and visualizes the persistence diagram.
