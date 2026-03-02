@@ -68,7 +68,7 @@ def persistence_graph(persistence, output_file):
         plt.savefig(output_file)
         
         # Print a confirmation message that the persistence diagram was saved
-        print(f"Persistence diagram saved as {output_file}")        
+        print(f"Persistence diagram saved as {output_file}")
 
 """
 end of script
