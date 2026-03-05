@@ -19,6 +19,7 @@ Notes on this file:
 import numpy as np
 import matplotlib as plt
 import wfdb
+import os
 
 from pathlib import Path
 
@@ -30,9 +31,9 @@ import construct_complex as cc
 
 lead_s = ['V1', 'V2', 'V3'] # These are the ones we are interested in at first, because these are the known indicators of Brugada Syndrome.
 
-# get_to_files = Path('./Brugada_dataset/files') ## UNCOMMENT THIS LATER
+subset = 2 # Change this when you move from one subset set to the next. (Subsets completed: 1, )
 
-get_to_files = Path('./Brugada_subset/files') ## This is for TESTING (REMOVE).
+get_to_files = Path(f'./Subset_{subset}/files')
 
 all_folder_names = []
 
@@ -59,9 +60,7 @@ while cycle < num_patients: # Cycles through patients.
 
         "Step 1: Point to the data"
 
-        # ptf = f'Brugada_dataset/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}' # This gets you to the patient. ## UNCOMMENT THIS LATER
-
-        ptf = f'Brugada_subset/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}' # This gets you to the patient. TESTING(REMOVE)
+        ptf = f'Subset_{subset}/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}' # This gets you to the patient.
 
         lead_in_cycle = [f'{lead_s[leads_to_cycle_through]}'] # This records which lead we are looking at.
 
@@ -84,15 +83,15 @@ while cycle < num_patients: # Cycles through patients.
         "Step 4: SWE"
 
         tau = 0.5
-        M = 3
+        M = 2
         # breakup_interval_more = 'insert more than len(signal) to break up your signal into more pieces and get more points in SWE.'
 
         projected_points = np.array(swe.SWE_get_points_nd(ptf, lead_in_cycle, wavelet, level_decomp, tau, M))
 
-        if M == 1:
-            swe.save_plot_2d(projected_points, naming_things)
-        elif M == 2:
-            swe.save_plot_3d(projected_points, naming_things)
+        # if M == 1: # If you want the plot pictures uncomment this if-then loop.
+        #     swe.save_plot_2d(projected_points, naming_things)
+        # elif M == 2:
+        #     swe.save_plot_3d(projected_points, naming_things)
 
         print(f"Performed Sliding Window Embedding. Shape = {projected_points.shape}. Now moving to Persistent Homology.")
 
@@ -118,6 +117,7 @@ while cycle < num_patients: # Cycles through patients.
 
         leads_to_cycle_through += 1
 
-    print(f"****** END ****** looking at patient {all_folder_names[cycle]}")
+    time_left = (num_patients - cycle -1)*4
+    print(f"****** END ****** looking at patient {all_folder_names[cycle]}. Patient {cycle + 1}/{num_patients}. About {time_left} minutes left.")
 
     cycle += 1
