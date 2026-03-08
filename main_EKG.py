@@ -31,7 +31,7 @@ import construct_complex as cc
 
 lead_s = ['V1', 'V2', 'V3'] # These are the ones we are interested in at first, because these are the known indicators of Brugada Syndrome.
 
-subset = 2 # Change this when you move from one subset set to the next. (Subsets completed: 1, )
+subset = 4 # Change this when you move from one subset set to the next. (Subsets completed: 1, 2, 3, )
 
 get_to_files = Path(f'./Subset_{subset}/files')
 
@@ -117,7 +117,7 @@ while cycle < num_patients: # Cycles through patients.
 
         leads_to_cycle_through += 1
 
-    time_left = (num_patients - cycle -1)*4
+    time_left = (num_patients - cycle -1)*2.5
     print(f"****** END ****** looking at patient {all_folder_names[cycle]}. Patient {cycle + 1}/{num_patients}. About {time_left} minutes left.")
 
     cycle += 1
