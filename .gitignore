@@ -1,6 +1,5 @@
 Testing.py
 Note_to_self.txt
-gtda-env/
 test_images/
 Documentation.txt
 Outputs of main/
@@ -9,11 +8,6 @@ jingle.py
 NN.py
 My_stuff.py
 Outputs/
-Subset_1/
-Subset_2/
-Subset_3/
-Subset_4/
-Subset_5/
-Subset_6/
 Test_subsets/
 All_Outputs/
+annotation_file.csv
