@@ -31,7 +31,7 @@ import construct_complex as cc
 
 lead_s = ['V1', 'V2', 'V3'] # These are the ones we are interested in at first, because these are the known indicators of Brugada Syndrome.
 
-subset = 4 # Change this when you move from one subset set to the next. (Subsets completed: 1, 2, 3, )
+subset = 5 # Change this when you move from one subset set to the next. (Subsets completed: 1, 2, 3, 4, )
 
 get_to_files = Path(f'./Subset_{subset}/files')
 
