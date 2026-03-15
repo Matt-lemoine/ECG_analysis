@@ -11,3 +11,6 @@ Outputs/
 Test_subsets/
 All_Outputs/
 annotation_file.csv
+TopLR.py
+Total_areas.csv
+Log_Reg.py
