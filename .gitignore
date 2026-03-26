@@ -14,3 +14,5 @@ annotation_file.csv
 TopLR.py
 Total_areas.csv
 Log_Reg.py
+testing_random.py
+my_xgboost.py
