@@ -16,3 +16,4 @@ Total_areas.csv
 Log_Reg.py
 testing_random.py
 my_xgboost.py
+NN_area.py
