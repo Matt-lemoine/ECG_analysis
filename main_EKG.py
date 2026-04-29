@@ -33,7 +33,9 @@ lead_s = ['V1', 'V2', 'V3'] # These are the ones we are interested in at first, 
 
 subset = 6 # Change this when you move from one subset set to the next. (Subsets completed: 1, 2, 3, 4, 5, )
 
-get_to_files = Path(f'./Subset_{subset}/files')
+# get_to_files = Path(f'./Subset_{subset}/files')
+
+get_to_files = Path('./Subsets_(done)/Brugada_subset/files') # This is for testing.
 
 all_folder_names = []
 
@@ -60,7 +62,9 @@ while cycle < num_patients: # Cycles through patients.
 
         "Step 1: Point to the data"
 
-        ptf = f'Subset_{subset}/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}' # This gets you to the patient.
+        # ptf = f'Subset_{subset}/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}' # This gets you to the patient.
+
+        ptf = f'Subsets_(done)/Brugada_subset/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}'
 
         lead_in_cycle = [f'{lead_s[leads_to_cycle_through]}'] # This records which lead we are looking at.
 
@@ -82,11 +86,13 @@ while cycle < num_patients: # Cycles through patients.
         
         "Step 4: SWE"
 
-        tau = 0.5
+        # tau = 0.5
+        tau = 1.25 # I use this one for the Cubic Spline approximation.
         M = 2
         # breakup_interval_more = 'insert more than len(signal) to break up your signal into more pieces and get more points in SWE.'
 
-        projected_points = np.array(swe.SWE_get_points_nd(ptf, lead_in_cycle, wavelet, level_decomp, tau, M))
+        # projected_points = np.array(swe.SWE_get_points_nd(ptf, lead_in_cycle, wavelet, level_decomp, tau, M)) # This is using the Wavelet to approximate the EKG.
+        projected_points = np.array(swe.SWE_w_spline(ptf, lead_in_cycle, tau, M)) # This is using the Cubic Spline to approximate the EKG.
 
         # if M == 1: # If you want the plot pictures uncomment this if-then loop.
         #     swe.save_plot_2d(projected_points, naming_things)

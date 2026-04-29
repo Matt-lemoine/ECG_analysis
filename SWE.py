@@ -158,3 +158,181 @@ def SWE_get_points_nd_TESTING(ptf, lead_s, wavelet, level_decomp, tau, M, sample
         i = i+1
 
     return projected_points
+
+
+"""
+The following piece of code is to use the function defended by the cubic splines to give you the sliding window
+    embedding. I want to use as many points as possible, so the loops in the upstairs space are prominant and 
+    the noise acts as its own cluster.
+"""
+
+import Spline_approx as sa
+
+def SWE_w_spline(ptf, lead_s, tau, M):
+
+    # The default for this function is to break up the interval in which the trimmed EKG into 1 for each point 
+    #   in the original signal. So, if your trimmed signal has 802 points, then this will break up the interval
+    #   [0, 802] into 802 one unit pieces.
+
+    fun, n = sa.get_trimmed_cs_int(ptf, lead_s)
+
+    # I want there to be the same number of points in the SWEs, so I will set the n as 1000.
+
+    num_points = 2500
+
+    step_size = n/num_points
+
+    # tau = n/6 # this is the period of the ekg.
+
+    projected_points = []
+
+    i = 0
+    while i < num_points:
+        x = step_size*i
+        point = []
+        j = 0
+        while j <= M:
+            x_pro = x+(j*tau)
+            if x_pro > n-1:
+                point = []
+                i = num_points
+                break
+            else:
+                k = fun(x_pro)
+                point.append(k)
+                j = j+1
+        
+        if point != []:
+            projected_points.append(point)
+            i = i+1
+        else:
+            break
+
+    return projected_points
+
+def SWE_no_approx(ptf, lead, M): # for this function tau is not defined because you just pick the next point in the ECG signal. So it is 1 or 0.01 sec.
+
+    # The default for this function is to break up the interval in which the trimmed EKG into 1 for each point 
+    #   in the original signal. So, if your trimmed signal has 802 points, then this will break up the interval
+    #   [0, 802] into 802 one unit pieces.
+
+    trimmed_signal = nekg.trim_EKG(ptf, lead_s)
+
+    n = len(trimmed_signal)
+
+    projected_points = []
+
+    i = 0
+    while i < n:
+        x = i
+        point = []
+        j = 0
+        while j <= M:
+            x_pro = x+j
+            if x_pro > n-1:
+                point = []
+                i = n
+                break
+            else:
+                k = trimmed_signal[x_pro]
+                point.append(k)
+                j = j+1
+        
+        if point != []:
+            projected_points.append(point)
+            i = i+1
+        else:
+            break
+
+    return projected_points
+
+
+
+
+tau = 1.25
+
+ptf = "Brugada_dataset/files/188981/188981"
+lead_s = ['V2']
+# pro_points = np.array(SWE_w_spline(ptf, lead_s, tau, 2))
+
+pro_points = np.array(SWE_no_approx(ptf, lead_s, 2))
+
+# plot_2d(pro_points)
+
+
+# import numpy as np
+# import matplotlib.pyplot as plt
+# from matplotlib.animation import FuncAnimation
+
+# points = pro_points
+
+# # Build edges (you actually don't even need this list)
+# edges = [(i, (i+1) % len(points)) for i in range(len(points))]
+
+# fig, ax = plt.subplots()
+
+# # Plot all points (static)
+# ax.scatter(points[:, 0], points[:, 1], color='blue', s = 1)
+
+# # Line that will grow over time
+# line, = ax.plot([], [], color='red', linewidth=1)
+
+# def update(frame):
+#     # Take all points up to current frame
+#     current_points = points[:frame]
+
+#     # Close the loop if at the end
+#     if frame == len(points):
+#         current_points = np.vstack([current_points, points[0]])
+
+#     line.set_data(current_points[:, 0], current_points[:, 1])
+
+#     return line,
+
+# ani = FuncAnimation(fig, update, frames=len(points), interval=30)
+
+# # ani.save("animation_251972_2500.gif", writer='pillow', fps=20)
+
+# plt.show()
+
+
+
+
+
+# for 3d
+
+
+
+
+
+
+# import numpy as np
+# import matplotlib.pyplot as plt
+# from matplotlib.animation import FuncAnimation
+
+# points = pro_points
+
+# fig = plt.figure()
+# ax = fig.add_subplot(projection='3d')
+
+# # Static points
+# ax.scatter(points[:, 0], points[:, 1], points[:, 2], color='blue', s=1)
+
+# points = np.squeeze(pro_points)
+
+# line, = ax.plot([], [], [], color='red', linewidth=2)
+
+# def update(frame):
+#     current_points = points[:frame+1]
+
+#     if frame == len(points) - 1:
+#         current_points = np.vstack([current_points, points[0]])
+
+#     line.set_data(current_points[:, 0], current_points[:, 1])
+#     line.set_3d_properties(current_points[:, 2])
+
+#     return line,
+
+# ani = FuncAnimation(fig, update, frames=len(points), interval=30)
+
+# plt.show()
