@@ -216,7 +216,7 @@ def SWE_no_approx(ptf, lead, M): # for this function tau is not defined because 
     #   in the original signal. So, if your trimmed signal has 802 points, then this will break up the interval
     #   [0, 802] into 802 one unit pieces.
 
-    trimmed_signal = nekg.trim_EKG(ptf, lead_s)
+    trimmed_signal = nekg.trim_EKG(ptf, lead)
 
     n = len(trimmed_signal)
 
@@ -249,13 +249,13 @@ def SWE_no_approx(ptf, lead, M): # for this function tau is not defined because 
 
 
 
-tau = 1.25
+# tau = 1.25
 
-ptf = "Brugada_dataset/files/188981/188981"
-lead_s = ['V2']
-# pro_points = np.array(SWE_w_spline(ptf, lead_s, tau, 2))
+# ptf = "Brugada_dataset/files/188981/188981"
+# lead_s = ['V2']
+# # pro_points = np.array(SWE_w_spline(ptf, lead_s, tau, 2))
 
-pro_points = np.array(SWE_no_approx(ptf, lead_s, 2))
+# pro_points = np.array(SWE_no_approx(ptf, lead_s, 2))
 
 # plot_2d(pro_points)
 

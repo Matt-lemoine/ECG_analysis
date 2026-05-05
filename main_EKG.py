@@ -31,11 +31,13 @@ import construct_complex as cc
 
 lead_s = ['V1', 'V2', 'V3'] # These are the ones we are interested in at first, because these are the known indicators of Brugada Syndrome.
 
-subset = 6 # Change this when you move from one subset set to the next. (Subsets completed: 1, 2, 3, 4, 5, )
+subset = 8 # Change this when you move from one subset set to the next. (Subsets completed: up through and including 7)
 
 # get_to_files = Path(f'./Subset_{subset}/files')
 
-get_to_files = Path('./Subsets_(done)/Brugada_subset/files') # This is for testing.
+# get_to_files = Path(f'./Subsets_(done)/Subset_{subset}_(done)/files')
+
+get_to_files = Path(f'./Brugada_dataset/files')
 
 all_folder_names = []
 
@@ -47,6 +49,8 @@ num_patients = len(all_folder_names)
 
 # This while loop cycles through all the folders and thus all the patients in the 'Brugada/files' file.
 
+done_patients = []
+funky_patients = []
 cycle = 0
 while cycle < num_patients: # Cycles through patients.
 
@@ -64,8 +68,11 @@ while cycle < num_patients: # Cycles through patients.
 
         # ptf = f'Subset_{subset}/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}' # This gets you to the patient.
 
-        ptf = f'Subsets_(done)/Brugada_subset/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}'
+        # ptf = f'Subsets_(done)/Brugada_subset/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}'
 
+        # ptf = f'Subsets_(done)/Subset_{subset}_(done)/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}'
+
+        ptf = f'Brugada_dataset/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}'
         lead_in_cycle = [f'{lead_s[leads_to_cycle_through]}'] # This records which lead we are looking at.
 
         
@@ -83,6 +90,9 @@ while cycle < num_patients: # Cycles through patients.
         wavelet = 'db3'
         level_decomp = 4
 
+        # For this run, we are not approximating the EKGs with wavelets or splines. We are getting the 'raw' ekgs and projecting those
+        # Then we will test using the Betti Curves (code to be written) and the Persistence Vector to see which gives better results.
+
         
         "Step 4: SWE"
 
@@ -92,7 +102,10 @@ while cycle < num_patients: # Cycles through patients.
         # breakup_interval_more = 'insert more than len(signal) to break up your signal into more pieces and get more points in SWE.'
 
         # projected_points = np.array(swe.SWE_get_points_nd(ptf, lead_in_cycle, wavelet, level_decomp, tau, M)) # This is using the Wavelet to approximate the EKG.
-        projected_points = np.array(swe.SWE_w_spline(ptf, lead_in_cycle, tau, M)) # This is using the Cubic Spline to approximate the EKG.
+        # projected_points = np.array(swe.SWE_w_spline(ptf, lead_in_cycle, tau, M)) # This is using the Cubic Spline to approximate the EKG.
+
+        pro_points = swe.SWE_no_approx(ptf, lead_in_cycle, M)
+        projected_points = np.array(pro_points)
 
         # if M == 1: # If you want the plot pictures uncomment this if-then loop.
         #     swe.save_plot_2d(projected_points, naming_things)
@@ -101,6 +114,17 @@ while cycle < num_patients: # Cycles through patients.
 
         print(f"Performed Sliding Window Embedding. Shape = {projected_points.shape}. Now moving to Persistent Homology.")
 
+        # if leads_to_cycle_through == 0: # this is to double check that the leads aren't funky looking.
+        #     length_of_trim_V1 = len(projected_points)
+        # elif leads_to_cycle_through == 1:
+        #     length_of_trim_V2 = len(projected_points)
+        # elif leads_to_cycle_through == 2:
+        #     length_of_trim_V3 = len(projected_points)
+        #     if abs(length_of_trim_V1 - length_of_trim_V2) > 50 or abs(length_of_trim_V1 - length_of_trim_V3) > 50 or abs(length_of_trim_V3 - length_of_trim_V2) > 50:
+        #         print(f"{all_folder_names[cycle]} is a funky one. Double check the trim.")
+        #         funky_patients.append(all_folder_names[cycle])
+        #     else:
+        #         print('All is well')
 
         "Step 5: Persistent Homology of SWE point cloud"
 
@@ -108,7 +132,7 @@ while cycle < num_patients: # Cycles through patients.
         output_file_graph = f"{naming_things}_pers_diagram"
 
         max_dimension = 2
-        max_edge_length = 1
+        max_edge_length = 1.5
 
         persistence = cc.construct_calculate(projected_points, max_dimension, max_edge_length, output_csv_name)
 
@@ -123,7 +147,12 @@ while cycle < num_patients: # Cycles through patients.
 
         leads_to_cycle_through += 1
 
+    done_patients.append(all_folder_names[cycle])
+
     time_left = (num_patients - cycle -1)*2.5
     print(f"****** END ****** looking at patient {all_folder_names[cycle]}. Patient {cycle + 1}/{num_patients}. About {time_left} minutes left.")
+    print(f'### The patients that are done are {done_patients} ###')
 
     cycle += 1
+
+print(f"funky_patients = {funky_patients}")
