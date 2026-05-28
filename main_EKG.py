@@ -31,7 +31,7 @@ import construct_complex as cc
 
 lead_s = ['V1', 'V2', 'V3'] # These are the ones we are interested in at first, because these are the known indicators of Brugada Syndrome.
 
-subset = 8 # Change this when you move from one subset set to the next. (Subsets completed: up through and including 7)
+subset = 1 # Change this when you move from one subset set to the next. (Subsets completed: up through and including 7)
 
 # get_to_files = Path(f'./Subset_{subset}/files')
 
@@ -50,7 +50,7 @@ num_patients = len(all_folder_names)
 # This while loop cycles through all the folders and thus all the patients in the 'Brugada/files' file.
 
 done_patients = []
-funky_patients = []
+funky_patients_and_leads = []
 cycle = 0
 while cycle < num_patients: # Cycles through patients.
 
@@ -104,44 +104,48 @@ while cycle < num_patients: # Cycles through patients.
         # projected_points = np.array(swe.SWE_get_points_nd(ptf, lead_in_cycle, wavelet, level_decomp, tau, M)) # This is using the Wavelet to approximate the EKG.
         # projected_points = np.array(swe.SWE_w_spline(ptf, lead_in_cycle, tau, M)) # This is using the Cubic Spline to approximate the EKG.
 
-        pro_points = swe.SWE_no_approx(ptf, lead_in_cycle, M)
-        projected_points = np.array(pro_points)
+        if nekg.trim_EKG(ptf, lead_in_cycle) is str("funky"):
+            funky_patients_and_leads.append([f'{all_folder_names[cycle]}', lead_in_cycle])
+            print(f"{all_folder_names[cycle]} looks funky")
+        else:
+            pro_points = swe.SWE_no_approx(ptf, lead_in_cycle, M)
+            projected_points = np.array(pro_points)
 
-        # if M == 1: # If you want the plot pictures uncomment this if-then loop.
-        #     swe.save_plot_2d(projected_points, naming_things)
-        # elif M == 2:
-        #     swe.save_plot_3d(projected_points, naming_things)
+            # if M == 1: # If you want the plot pictures uncomment this if-then loop.
+            #     swe.save_plot_2d(projected_points, naming_things)
+            # elif M == 2:
+            #     swe.save_plot_3d(projected_points, naming_things)
 
-        print(f"Performed Sliding Window Embedding. Shape = {projected_points.shape}. Now moving to Persistent Homology.")
+            print(f"Performed Sliding Window Embedding. Shape = {projected_points.shape}. Now moving to Persistent Homology.")
 
-        # if leads_to_cycle_through == 0: # this is to double check that the leads aren't funky looking.
-        #     length_of_trim_V1 = len(projected_points)
-        # elif leads_to_cycle_through == 1:
-        #     length_of_trim_V2 = len(projected_points)
-        # elif leads_to_cycle_through == 2:
-        #     length_of_trim_V3 = len(projected_points)
-        #     if abs(length_of_trim_V1 - length_of_trim_V2) > 50 or abs(length_of_trim_V1 - length_of_trim_V3) > 50 or abs(length_of_trim_V3 - length_of_trim_V2) > 50:
-        #         print(f"{all_folder_names[cycle]} is a funky one. Double check the trim.")
-        #         funky_patients.append(all_folder_names[cycle])
-        #     else:
-        #         print('All is well')
+            # if leads_to_cycle_through == 0: # this is to double check that the leads aren't funky looking.
+            #     length_of_trim_V1 = len(projected_points)
+            # elif leads_to_cycle_through == 1:
+            #     length_of_trim_V2 = len(projected_points)
+            # elif leads_to_cycle_through == 2:
+            #     length_of_trim_V3 = len(projected_points)
+            #     if abs(length_of_trim_V1 - length_of_trim_V2) > 50 or abs(length_of_trim_V1 - length_of_trim_V3) > 50 or abs(length_of_trim_V3 - length_of_trim_V2) > 50:
+            #         print(f"{all_folder_names[cycle]} is a funky one. Double check the trim.")
+            #         funky_patients.append(all_folder_names[cycle])
+            #     else:
+            #         print('All is well')
 
-        "Step 5: Persistent Homology of SWE point cloud"
+            "Step 5: Persistent Homology of SWE point cloud"
 
-        output_csv_name = f"{naming_things}_pers_info"
-        output_file_graph = f"{naming_things}_pers_diagram"
+            output_csv_name = f"{naming_things}_pers_info"
+            output_file_graph = f"{naming_things}_pers_diagram"
 
-        max_dimension = 2
-        max_edge_length = 1.5
+            max_dimension = 2
+            max_edge_length = 1.5
 
-        persistence = cc.construct_calculate(projected_points, max_dimension, max_edge_length, output_csv_name)
+            persistence = cc.construct_calculate(projected_points, max_dimension, max_edge_length, output_csv_name)
 
-        try:
-            cc.persistence_graph(persistence, output_file_graph)
-        except Exception as e:
-            print(f"An error occurred during the persistence graph: {e}")
+            try:
+                cc.persistence_graph(persistence, output_file_graph)
+            except Exception as e:
+                print(f"An error occurred during the persistence graph: {e}")
 
-        print("Persistence Calculated")
+            print("Persistence Calculated")
 
         print(f"END looking at lead {lead_s[leads_to_cycle_through]}")
 
@@ -155,4 +159,6 @@ while cycle < num_patients: # Cycles through patients.
 
     cycle += 1
 
-print(f"funky_patients = {funky_patients}")
+print(f"funky_patients_and_leads = {funky_patients}")
+
+print("The funky_patients_and_leads are the lead_s you have to go in and hand trim, all other ones are correct. You will have to re-run the code and edit it so that you can find the places to trim and perform the trim by hand function.")

@@ -216,7 +216,44 @@ def SWE_no_approx(ptf, lead, M): # for this function tau is not defined because 
     #   in the original signal. So, if your trimmed signal has 802 points, then this will break up the interval
     #   [0, 802] into 802 one unit pieces.
 
-    trimmed_signal = nekg.trim_EKG(ptf, lead)
+    trimmed_signal = nekg.trim_EKG_is_good(ptf, lead)
+
+    n = len(trimmed_signal)
+
+    projected_points = []
+
+    i = 0
+    while i < n:
+        x = i
+        point = []
+        j = 0
+        while j <= M:
+            x_pro = x+j
+            if x_pro > n-1:
+                point = []
+                i = n
+                break
+            else:
+                k = trimmed_signal[x_pro]
+                point.append(k)
+                j = j+1
+        
+        if point != []:
+            projected_points.append(point)
+            i = i+1
+        else:
+            break
+
+    return projected_points
+
+
+def SWE_no_approx_by_hand(ptf, lead, M): # for this function tau is not defined because you just pick the next point in the ECG signal. So it is 1 or 0.01 sec.
+
+    # The default for this function is to break up the interval in which the trimmed EKG into 1 for each point 
+    #   in the original signal. So, if your trimmed signal has 802 points, then this will break up the interval
+    #   [0, 802] into 802 one unit pieces.
+
+    trimmed_signal = nekg.trim_by_hand(ptf, lead)
 
     n = len(trimmed_signal)
 
