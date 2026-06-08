@@ -44,5 +44,5 @@ The necessary libraries for this code includes the following.
 13. xgboost
 
 
-Code created by Matthew Lemoine, for more information about the project and the results see (insert link here for ArXiV.) If you have questions, please email mlemoine559@gmail.com.
+Code created by Matthew Lemoine, for more information about the project and the results see (insert link here for ArXiv). If you have questions, please email mlemoine559@gmail.com.
 
