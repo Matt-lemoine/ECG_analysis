@@ -33,21 +33,16 @@ The necessary libraries for this code includes the following.
 5. wfdb (This library allows for visualization of the ECGs and to be able to use the leads as an array.)
 6. os
 7. pathlib
-    8. Path
-9. time
-10. gudhi (This library is used for computing the persistent homology.)
-11. pandas
-12. sklearn.metrics
+    * Path
+8. time
+9. gudhi (This library is used for computing the persistent homology.)
+10. pandas
+11. sklearn.metrics
     * accuracy_score, confusion_matrix
-14. sklearn.model_selection
+12. sklearn.model_selection
     * train_test_split
-16. xgboost
+13. xgboost
 
 
+Code created by Matthew Lemoine, for more information about the project and the results see (insert link here for ArXiV.) If you have questions, please email mlemoine559@gmail.com.
 
-
-
-This is the README.md for the EKG_analysis pipeline. I have outlined below all the different files in this repo, the functions in these files, what they do, and how to use them. There is also more documentation in each of the files outlining how the functions call and work.
-
-In this repo we will have a pipeline that takes in EKG readings and outputs
-    Persistent homology of the SWE of the EKG.
