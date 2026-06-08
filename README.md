@@ -38,9 +38,9 @@ The necessary libraries for this code includes the following.
 10. gudhi (This library is used for computing the persistent homology.)
 11. pandas
 12. sklearn.metrics
-    13. accuracy_score, confusion_matrix
+    * accuracy_score, confusion_matrix
 14. sklearn.model_selection
-    15. train_test_split
+    * train_test_split
 16. xgboost
 
 
