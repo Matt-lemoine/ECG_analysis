@@ -286,15 +286,15 @@ def SWE_no_approx_by_hand(ptf, lead, M): # for this function tau is not defined 
 
 
 
-# tau = 1.25
+tau = 1
 
-# ptf = "Brugada_dataset/files/188981/188981"
-# lead_s = ['V2']
-# # pro_points = np.array(SWE_w_spline(ptf, lead_s, tau, 2))
+ptf = "Brugada_dataset/files/286830/286830"
+lead_s = ['V2']
+# pro_points = np.array(SWE_w_spline(ptf, lead_s, tau, 2))
 
-# pro_points = np.array(SWE_no_approx(ptf, lead_s, 2))
+pro_points = np.array(SWE_no_approx(ptf, lead_s, 2))
 
-# plot_2d(pro_points)
+plot_3d(pro_points)
 
 
 # import numpy as np
