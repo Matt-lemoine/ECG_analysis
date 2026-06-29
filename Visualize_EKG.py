@@ -3,6 +3,11 @@ import matplotlib as plt
 import wfdb
 import csv
 
+"""
+This file provides a way of visualizing each of the EKG readings. These functions are used in the Normalize_EKG.py file to find the upper and lower bounds of the trimming
+    for each of the EKGs.
+"""
+
 def get_EKG_leads(ptf, lead_s):
 
     record =  wfdb.rdrecord(ptf)

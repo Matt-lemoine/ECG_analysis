@@ -12,45 +12,38 @@ Notes on this file:
 
     Our two while loops cycle through the patients, then the leads we are looking at.
 
-    When you are importing the data, you do not need to import the data in main_EKG, because it is automatically imported
-    in each of the other files, you just need to specific where those files should look.
+    In this file, the output is a CSV and a PNG for each patient and lead detailing the Persistent homology. The CSV file will be used later to train the XGBoost.
 """
 
 import numpy as np
+import pandas as pd
 import matplotlib as plt
 import wfdb
 import os
+import os.path
 
 from pathlib import Path
 
 import Visualize_EKG as vekg
 import Normalize_EKG as nekg
-import Wavelet_approx as wa
 import SWE as swe
 import construct_complex as cc
 
 lead_s = ['V1', 'V2', 'V3'] # These are the ones we are interested in at first, because these are the known indicators of Brugada Syndrome.
 
-subset = 1 # Change this when you move from one subset set to the next. (Subsets completed: up through and including 7)
-
-# get_to_files = Path(f'./Subset_{subset}/files')
-
-# get_to_files = Path(f'./Subsets_(done)/Subset_{subset}_(done)/files')
-
-get_to_files = Path(f'./Brugada_dataset/files')
-
+get_to_files = Path(f'./Brugada_dataset/files') # This tells python where to look for the names of the Patient IDs.
 all_folder_names = []
-
-for subdir in get_to_files.iterdir(): # makes a list of all the files names (which are the patient numbers)
+for subdir in get_to_files.iterdir(): # makes a list of all the files names (which are the patient IDs.)
     if subdir.is_dir():
         all_folder_names.append(subdir.name)
 
 num_patients = len(all_folder_names)
 
-# This while loop cycles through all the folders and thus all the patients in the 'Brugada/files' file.
 
-done_patients = []
-funky_patients_and_leads = []
+# Load the CSV of trimming bounds as outlined in the All_Trimming_info.csv file.
+trimming_info = pd.read_csv("All_Trimming_info.csv")
+trimming_info = np.array(trimming_info)
+
 cycle = 0
 while cycle < num_patients: # Cycles through patients.
 
@@ -66,12 +59,6 @@ while cycle < num_patients: # Cycles through patients.
 
         "Step 1: Point to the data"
 
-        # ptf = f'Subset_{subset}/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}' # This gets you to the patient.
-
-        # ptf = f'Subsets_(done)/Brugada_subset/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}'
-
-        # ptf = f'Subsets_(done)/Subset_{subset}_(done)/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}'
-
         ptf = f'Brugada_dataset/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}'
         lead_in_cycle = [f'{lead_s[leads_to_cycle_through]}'] # This records which lead we are looking at.
 
@@ -80,85 +67,50 @@ while cycle < num_patients: # Cycles through patients.
 
         # There is no option to edit this from main_EKG.py. To edit any aspect of the normalization you must go to Normalize_EKG.py and edit there.
         # We have made a choice to pick out the middle-most 6 peaks from the EKG reading. This can be edited in the trim_EKG function.
-
         
-        "Step 3: Wavelet Approximation"
+        "Step 3: Get the bounds for trimming"
 
-        # I have been using 'db3' and decomp = 4. 
-        # There is no option to edit more from main_EKG.py. To edit more aspects of the wavelet approximation you must go to wavelet_approx.py and edit there.
+        index = trimming_info[:,0] == float(all_folder_names[cycle])
+        matching_rows = trimming_info[index]
 
-        wavelet = 'db3'
-        level_decomp = 4
+        index = matching_rows[:,1] == lead_s[leads_to_cycle_through]
+        matching_rows = matching_rows[index]
 
-        # For this run, we are not approximating the EKGs with wavelets or splines. We are getting the 'raw' ekgs and projecting those
-        # Then we will test using the Betti Curves (code to be written) and the Persistence Vector to see which gives better results.
-
+        lb = matching_rows[0,2]
+        ub = matching_rows[0,3]
         
         "Step 4: SWE"
 
-        # tau = 0.5
-        tau = 1.25 # I use this one for the Cubic Spline approximation.
-        M = 2
-        # breakup_interval_more = 'insert more than len(signal) to break up your signal into more pieces and get more points in SWE.'
+        # tau is fixed as 1 ms in the SWE.py file.
+        M = 1
 
-        # projected_points = np.array(swe.SWE_get_points_nd(ptf, lead_in_cycle, wavelet, level_decomp, tau, M)) # This is using the Wavelet to approximate the EKG.
-        # projected_points = np.array(swe.SWE_w_spline(ptf, lead_in_cycle, tau, M)) # This is using the Cubic Spline to approximate the EKG.
+        pro_points = swe.SWE_no_approx_with_CSV(ptf, lead_in_cycle, M, lb, ub)
+        projected_points = np.array(pro_points)
 
-        if nekg.trim_EKG(ptf, lead_in_cycle) is str("funky"):
-            funky_patients_and_leads.append([f'{all_folder_names[cycle]}', lead_in_cycle])
-            print(f"{all_folder_names[cycle]} looks funky")
-        else:
-            pro_points = swe.SWE_no_approx(ptf, lead_in_cycle, M)
-            projected_points = np.array(pro_points)
+        print(f"Performed Sliding Window Embedding. Shape = {projected_points.shape}. Now moving to Persistent Homology.")
 
-            # if M == 1: # If you want the plot pictures uncomment this if-then loop.
-            #     swe.save_plot_2d(projected_points, naming_things)
-            # elif M == 2:
-            #     swe.save_plot_3d(projected_points, naming_things)
+        "Step 5: Persistent Homology of SWE point cloud"
 
-            print(f"Performed Sliding Window Embedding. Shape = {projected_points.shape}. Now moving to Persistent Homology.")
+        output_csv_name = f"{naming_things}_pers_info"
+        output_file_graph = f"{naming_things}_pers_diagram"
 
-            # if leads_to_cycle_through == 0: # this is to double check that the leads aren't funky looking.
-            #     length_of_trim_V1 = len(projected_points)
-            # elif leads_to_cycle_through == 1:
-            #     length_of_trim_V2 = len(projected_points)
-            # elif leads_to_cycle_through == 2:
-            #     length_of_trim_V3 = len(projected_points)
-            #     if abs(length_of_trim_V1 - length_of_trim_V2) > 50 or abs(length_of_trim_V1 - length_of_trim_V3) > 50 or abs(length_of_trim_V3 - length_of_trim_V2) > 50:
-            #         print(f"{all_folder_names[cycle]} is a funky one. Double check the trim.")
-            #         funky_patients.append(all_folder_names[cycle])
-            #     else:
-            #         print('All is well')
+        max_dimension = 2           # This means we will look for the persistent homology for dimensions 0 and 1.
+        max_edge_length = 1.5
 
-            "Step 5: Persistent Homology of SWE point cloud"
+        persistence = cc.construct_calculate(projected_points, max_dimension, max_edge_length, output_csv_name)
 
-            output_csv_name = f"{naming_things}_pers_info"
-            output_file_graph = f"{naming_things}_pers_diagram"
+        try:
+            cc.persistence_graph(persistence, output_file_graph)
+        except Exception as e:
+            print(f"An error occurred during the persistence graph: {e}")
 
-            max_dimension = 2
-            max_edge_length = 1.5
-
-            persistence = cc.construct_calculate(projected_points, max_dimension, max_edge_length, output_csv_name)
-
-            try:
-                cc.persistence_graph(persistence, output_file_graph)
-            except Exception as e:
-                print(f"An error occurred during the persistence graph: {e}")
-
-            print("Persistence Calculated")
+        print("Persistence Calculated")
 
         print(f"END looking at lead {lead_s[leads_to_cycle_through]}")
 
         leads_to_cycle_through += 1
 
-    done_patients.append(all_folder_names[cycle])
-
     time_left = (num_patients - cycle -1)*2.5
-    print(f"****** END ****** looking at patient {all_folder_names[cycle]}. Patient {cycle + 1}/{num_patients}. About {time_left} minutes left.")
-    print(f'### The patients that are done are {done_patients} ###')
+    print(f"****** END ****** looking at patient {all_folder_names[cycle]}. Patient {cycle + 1}/{num_patients}. Approximately {time_left} minutes left.")
 
     cycle += 1
-
-print(f"funky_patients_and_leads = {funky_patients}")
-
-print("The funky_patients_and_leads are the lead_s you have to go in and hand trim, all other ones are correct. You will have to re-run the code and edit it so that you can find the places to trim and perform the trim by hand function.")

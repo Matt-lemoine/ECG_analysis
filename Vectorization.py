@@ -1,9 +1,11 @@
 # This file is for getting the Persistence Vector and the Betti Function for a given persistence diagram.
 
 import numpy as np
+import pandas as pd
 import matplotlib as plt
 import wfdb
 import os
+import os.path
 
 from pathlib import Path
 import csv
@@ -11,12 +13,9 @@ import time
 
 import Visualize_EKG as vekg
 import Normalize_EKG as nekg
-import Wavelet_approx as wa
 import SWE as swe
 import construct_complex as cc
 
-
-# start = time.time()
 
 def area_of_tri(b,d):
 
@@ -40,9 +39,7 @@ def area_of_trap(d_1, b_2, d_2):
     return area
 
 
-def per_vec_dim(persistence_diagram, dimension):
-
-    # persistence_diagram is a np.array
+def per_vec_dim(persistence_diagram, dimension): # This the the regular PCV where you do not consider the ovelapping triangles.
 
     count = 0
     total_area = 0
@@ -61,6 +58,20 @@ def per_vec_dim(persistence_diagram, dimension):
             i = i+1
     
     return [count, total_area]
+
+def per_vec_dim_noarea(persistence_diagram, dimension):
+
+    count = 0
+
+    i = 0
+    while i < len(persistence_diagram):
+        if persistence_diagram[i,0] == dimension and persistence_diagram[i,2] != float("inf"):
+            count = count + 1
+            i = i+1
+        else:
+            i = i+1
+    
+    return [count]
 
 def per_vec_dim_nocount(persistence_diagram, dimension):
 
@@ -82,31 +93,7 @@ def per_vec_dim_nocount(persistence_diagram, dimension):
     
     return [total_area]
 
-def per_vec_dim_arctan(persistence_diagram, dimension):
-
-    # persistence_diagram is a np.array
-
-    count = 0
-    total_area = 0
-
-    i = 0
-    while i < len(persistence_diagram):
-        if persistence_diagram[i,0] == dimension and persistence_diagram[i,2] != float("inf"):
-            b = persistence_diagram[i,1]
-            d = persistence_diagram[i,2]
-            triangle = area_of_tri(b,d)
-
-            total_area = total_area + triangle
-            count = count + 1
-            i = i+1
-        else:
-            i = i+1
-    
-    count = np.arctan(count)
-    
-    return [count, total_area]
-
-def per_vec_dim_overlap(persistence_diagram, dimension):
+def per_vec_dim_overlap(persistence_diagram, dimension): # This is the PCV where you do consider the overlapping triangles.
 
     # persistence_diagram is a np.array
 
@@ -265,20 +252,22 @@ def betti_fun(persistence_diagram, dimension, pat_id, lead, N):
     max_d = max(ds)
     max_time = max(max_b, max_d)
 
-    interval = max_time / N
+    if N == 0:
+        interval = max_time
+    else:
+        interval = max_time/N
 
     j = 0
     betti_vec = []
     betti_vec.append(pat_id)
     betti_vec.append(lead)
-    betti_vec.append(max_time)
     while j < N+1:
         t = j*interval
         if dimension == 0:
             count = 0
             i = 0
             while i < len(persistence_diagram):
-                if persistence_diagram[i,2] != float("inf") and persistence_diagram[i,0] == dimension and persistence_diagram[i,2] <= t:
+                if persistence_diagram[i,2] != float("inf") and persistence_diagram[i,0] == dimension and persistence_diagram[i,2] <= t+interval:
                     count = count + 1
                     i = i+1
                 else:
@@ -289,7 +278,10 @@ def betti_fun(persistence_diagram, dimension, pat_id, lead, N):
             i = 0
             while i < len(persistence_diagram):
                 if persistence_diagram[i,2] != float("inf") and persistence_diagram[i,0] == dimension:
-                    if (t <= persistence_diagram[i,1] < t+interval) or (persistence_diagram[i,1]<t and persistence_diagram[i,2]>=t):
+                    if t <= persistence_diagram[i,1]  and persistence_diagram[i,1] < t+interval:
+                        count = count+1
+                        i = i+1
+                    elif persistence_diagram[i,1]<t and persistence_diagram[i,2]>=t:
                         count = count+1
                         i = i+1
                     else:
@@ -305,17 +297,15 @@ def betti_fun(persistence_diagram, dimension, pat_id, lead, N):
         output = []
         output.append(betti_vec[0])
         output.append(betti_vec[1])
-        output.append(betti_vec[2])
-        i = 3
+        i = 2
         while i < len(betti_vec):
-            output.append(last_val - betti_vec[i] +1) #You add 1 for the one connected component you have at the end of the persistent homology.
+            output.append(betti_vec[i]) #You add 1 for the one connected component you have at the end of the persistent homology.
             i = i+1
         betti_vec = output
     else:
         j = len(betti_vec)
         output = []
-        output.append(betti_vec[2])
-        i = 3
+        i = 2
         while i < len(betti_vec):
             output.append(betti_vec[i])
             i = i+1
@@ -346,324 +336,24 @@ def put_together(thing_1, thing_2):
     return output
 
 
+"""
+The following while loops perform the vectorizations for all the different vectorizations of interest. They use the above functions to find the area of the triangles formed
+    by the features and the diagonal in each of the persistence diagrams.
 
+The input of this file is the persistence diagrams as written in the CSV files from the main_EKG.py file.
 
+The outputs of this file are the vectorizations of each of the persistence diagrams. These vectorizations are saved to a single CSV file based on the dimension of the SWE and the leads used.
 
-# # ##########For Chaos for Betti Vectors###############
+"""
 
 
-# lead_s = ['V1', 'V2', 'V3']
-# Ns = [5, 10]
-
-# get_to_files = Path('./Brugada_dataset/files')
-
-# all_folder_names = []
-
-# for subdir in get_to_files.iterdir(): # makes a list of all the files names (which are the patient numbers)
-#     if subdir.is_dir():
-#         all_folder_names.append(subdir.name)
-
-# num_patients = len(all_folder_names)
-
-# annotation = np.genfromtxt('Brugada_dataset/metadata.csv', delimiter=',', skip_header=1)
-
-# annotation = np.array([annotation[:,0], annotation[:,3]]).T
-
-# # This while loop cycles through all the folders and thus all the patients in the 'Brugada/files' file.
-
-# n = 0
-# while n < len(Ns):
-    # start = time.time()
-#     N = Ns[n]
-#     output_csv_file = f"Betti_Vectorization_V2_V3_{N}.csv"
-#     with open(output_csv_file, "w", newline="") as f:
-#         writer = csv.writer(f)
-                
-#         i = 0
-#         while i < num_patients:
-#             # print(num_patients - i)
-#             pat_id = all_folder_names[i]
-
-#             x = np.searchsorted(annotation[:,0], float(pat_id))
-
-#             value = annotation[x,1]
-
-#             if value == 2: # This takes out all the 7 entries of Brugada + some other heart murmur.
-#                 i = i+1
-#             else:
-#                 j = 0
-#                 while j < len(lead_s):
-#                     lead = lead_s[j]
-#                     pers_diagram = np.genfromtxt(f'Big_Output_thorough/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
-
-#                     dim = 0
-#                     while dim < 2:
-#                         if dim == 0:
-#                             part_0 = betti_fun(pers_diagram, dim, pat_id, lead, N)
-#                             dim = dim +1
-#                         else:
-#                             part_1 = betti_fun(pers_diagram, dim, pat_id, lead, N)
-#                             dim = dim +1
-
-#                     blah = put_together(part_0, part_1)
-#                     blah.append(value)
-#                     blah = np.array(blah)
-
-#                     if lead == 'V2' or lead == 'V3':
-#                         writer.writerow(blah)
-#                         j = j+1
-#                     else:
-#                         j = j+1
-
-#                     # writer.writerow(blah)
-#                     # j = j+1
-
-#                 i = i+1
-    
-#     time.sleep(1)
-#     end = time.time()
-
-#     print(f"Total runtime of the program is {end - start} seconds")
-
-#     n = n+1
-
-# ######For Chaos for Persistence Vector##########
-
-# lead_s = ['V1', 'V2', 'V3']
-
-# get_to_files = Path('./Brugada_dataset/files')
-
-# all_folder_names = []
-
-# for subdir in get_to_files.iterdir(): # makes a list of all the files names (which are the patient numbers)
-#     if subdir.is_dir():
-#         all_folder_names.append(subdir.name)
-
-# num_patients = len(all_folder_names)
-
-# annotation = np.genfromtxt('Brugada_dataset/metadata.csv', delimiter=',', skip_header=1)
-
-# annotation = np.array([annotation[:,0], annotation[:,3]]).T
-
-# # This while loop cycles through all the folders and thus all the patients in the 'Brugada/files' file.
-
-# output_csv_file = "Pers_Vec_Vectorization_V3.csv"
-# with open(output_csv_file, "w", newline="") as f:
-#     writer = csv.writer(f)
-#     writer.writerow(["Patient_ID", "lead", "Total 0 Count", "Total 0 area", "Total 1 Count", "Total 1 area", "Value"])
-    
-#     i = 0
-#     while i < num_patients:
-#         # print(num_patients - i)
-#         pat_id = all_folder_names[i]
-
-#         x = np.searchsorted(annotation[:,0], float(pat_id))
-
-#         value = annotation[x,1]
-
-#         if value == 2: # This takes care of the places where you have a patient with Brugada + some other heart murmur.
-#             i = i+1
-#         else:
-#             j = 0
-#             while j < len(lead_s):
-#                 lead = lead_s[j]
-#                 pers_diagram = np.genfromtxt(f'Big_Output_thorough/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
-
-#                 dim = 0
-#                 while dim < 2:
-#                     if dim == 0:
-#                         part_0 = per_vec_dim(pers_diagram, dim)
-#                         dim = dim +1
-#                     else:
-#                         part_1 = per_vec_dim(pers_diagram, dim)
-#                         dim = dim +1
-
-#                 blah = put_together(part_0, part_1)
-#                 info = [pat_id, lead]
-#                 blah = put_together(info, blah)
-#                 blah.append(value)
-#                 blah = np.array(blah)
-
-#                 if lead == 'V3':
-#                     writer.writerow(blah)
-#                     j = j+1
-#                 else:
-#                     j = j+1
-
-#                 # writer.writerow(blah)
-#                 # j = j+1
-
-#             i = i+1
-
-# time.sleep(1)
-# end = time.time()
-
-# print(f"Total runtime of the program is {end - start} seconds")
-
-
-
-
-# ######For Chaos for Persistence Vector with ARCTAN##########
-
-# start = time.time()
-
-# lead_s = ['V1', 'V2', 'V3']
-
-# get_to_files = Path('./Brugada_dataset/files')
-
-# all_folder_names = []
-
-# for subdir in get_to_files.iterdir(): # makes a list of all the files names (which are the patient numbers)
-#     if subdir.is_dir():
-#         all_folder_names.append(subdir.name)
-
-# num_patients = len(all_folder_names)
-
-# annotation = np.genfromtxt('Brugada_dataset/metadata.csv', delimiter=',', skip_header=1)
-
-# annotation = np.array([annotation[:,0], annotation[:,3]]).T
-
-# # This while loop cycles through all the folders and thus all the patients in the 'Brugada/files' file.
-
-# output_csv_file = "Pers_Vec_Arctan_Vectorization_V2_V3.csv"
-# with open(output_csv_file, "w", newline="") as f:
-#     writer = csv.writer(f)
-#     writer.writerow(["Patient_ID", "lead", "Total 0 Count", "Total 0 area", "Total 1 Count", "Total 1 area", "Value"])
-    
-#     i = 0
-#     while i < num_patients:
-#         # print(num_patients - i)
-#         pat_id = all_folder_names[i]
-
-#         x = np.searchsorted(annotation[:,0], float(pat_id))
-
-#         value = annotation[x,1]
-
-#         if value == 2: # This takes care of the places where you have a patient with Brugada + some other heart murmur.
-#             i = i+1
-#         else:
-#             j = 0
-#             while j < len(lead_s):
-#                 lead = lead_s[j]
-#                 pers_diagram = np.genfromtxt(f'Big_Output_thorough/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
-
-#                 dim = 0
-#                 while dim < 2:
-#                     if dim == 0:
-#                         part_0 = per_vec_dim_arctan(pers_diagram, dim)
-#                         dim = dim +1
-#                     else:
-#                         part_1 = per_vec_dim_arctan(pers_diagram, dim)
-#                         dim = dim +1
-
-#                 blah = put_together(part_0, part_1)
-#                 info = [pat_id, lead]
-#                 blah = put_together(info, blah)
-#                 blah.append(value)
-#                 blah = np.array(blah)
-
-#                 if lead == 'V2' or lead == 'V3':
-#                     writer.writerow(blah)
-#                     j = j+1
-#                 else:
-#                     j = j+1
-
-#                 # writer.writerow(blah)
-#                 # j = j+1
-
-#             i = i+1
-
-# time.sleep(1)
-# end = time.time()
-
-# print(f"Total runtime of the program is {end - start} seconds")
-
-
-# ######For Chaos for Persistence Vector no overlaps##########
-
-# start = time.time()
-
-# lead_s = ['V1', 'V2', 'V3']
-
-# get_to_files = Path('./Brugada_dataset/files')
-
-# all_folder_names = []
-
-# for subdir in get_to_files.iterdir(): # makes a list of all the files names (which are the patient numbers)
-#     if subdir.is_dir():
-#         all_folder_names.append(subdir.name)
-
-# num_patients = len(all_folder_names)
-
-# annotation = np.genfromtxt('Brugada_dataset/metadata.csv', delimiter=',', skip_header=1)
-
-# annotation = np.array([annotation[:,0], annotation[:,3]]).T
-
-# # This while loop cycles through all the folders and thus all the patients in the 'Brugada/files' file.
-
-# output_csv_file = "Pers_Vec_Vectorization_nooverlap_all.csv"
-# with open(output_csv_file, "w", newline="") as f:
-#     writer = csv.writer(f)
-#     writer.writerow(["Patient_ID", "lead", "Total 0 Count", "Total 0 area", "Total 1 Count", "Total 1 area", "Value"])
-    
-#     i = 0
-#     while i < num_patients:
-#         # print(num_patients - i)
-#         pat_id = all_folder_names[i]
-
-#         x = np.searchsorted(annotation[:,0], float(pat_id))
-
-#         value = annotation[x,1]
-
-#         if value == 2: # This takes care of the places where you have a patient with Brugada + some other heart murmur.
-#             i = i+1
-#         else:
-#             j = 0
-#             while j < len(lead_s):
-#                 lead = lead_s[j]
-#                 pers_diagram = np.genfromtxt(f'Big_Output_thorough/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
-
-#                 dim = 0
-#                 while dim < 2:
-#                     if dim == 0:
-#                         part_0 = per_vec_dim_overlap(pers_diagram, dim)
-#                         dim = dim +1
-#                     else:
-#                         part_1 = per_vec_dim_overlap(pers_diagram, dim)
-#                         dim = dim +1
-
-#                 blah = put_together(part_0, part_1)
-#                 info = [pat_id, lead]
-#                 blah = put_together(info, blah)
-#                 blah.append(value)
-#                 blah = np.array(blah)
-
-#                 # if lead == 'V1':
-#                 #     writer.writerow(blah)
-#                 #     j = j+1
-#                 # else:
-#                 #     j = j+1
-
-#                 writer.writerow(blah)
-#                 j = j+1
-
-#             i = i+1
-
-# time.sleep(1)
-# end = time.time()
-
-# print(f"Total runtime of the program is {end - start} seconds")
-
-
-
-######For Chaos for Persistence Vector no count with overlap##########
-
-start = time.time()
-
+Rns = ['R2', 'R3', 'R4'] # If you have a specific R_n that you are interested in, specify that here.
+Vectorizations = ['Betti_Vectorization', 'Pers_Vec_Vectorization', 'Pers_Vec_Vectorization_nooverlap', 'Pers_Vec_Vectorization_nocount', 'Pers_Vec_Vectorization_nocount_nooverlap', 'Pers_Vec_Vectorization_noarea']
+ending_leads = ['_all', '_V1', '_V2', '_V3', '_V1_V2', '_V1_V3', '_V2_V3']
 lead_s = ['V1', 'V2', 'V3']
 
-get_to_files = Path('./Brugada_dataset/files')
 
+get_to_files = Path('./Brugada_dataset/files')
 all_folder_names = []
 
 for subdir in get_to_files.iterdir(): # makes a list of all the files names (which are the patient numbers)
@@ -673,136 +363,635 @@ for subdir in get_to_files.iterdir(): # makes a list of all the files names (whi
 num_patients = len(all_folder_names)
 
 annotation = np.genfromtxt('Brugada_dataset/metadata.csv', delimiter=',', skip_header=1)
-
 annotation = np.array([annotation[:,0], annotation[:,3]]).T
 
-# This while loop cycles through all the folders and thus all the patients in the 'Brugada/files' file.
+ann = []
+a = 0
+while a < len(annotation):
+    row = annotation[a]
+    if row[1] == 0 or row[1] == 1:
+        ann.append(row)
+        a = a+1
+    else:
+        row = [row[0], 1]
+        ann.append(row)
+        a = a+1
 
-output_csv_file = "Pers_Vec_Vectorization_nocount_V2_V3.csv"
-with open(output_csv_file, "w", newline="") as f:
-    writer = csv.writer(f)
-    writer.writerow(["Patient_ID", "lead", "Total 0 area", "Total 1 area", "Value"])
+ann = np.array(ann)
+
+c = 0
+while c < len(Vectorizations):
+    vectorization = Vectorizations[c]
+
+    r = 0
+    while r < len(Rns):
+        which_R = Rns[r]
+
+        Ns = [0, 4, 9, 99] # For the Betti_Vector your input should be 1 less than you want actually want. These correspond to [1, 5, 10, 100] resp.
+
+        el = 0
+        while el < len(ending_leads):
+            suffix = ending_leads[el]
+
+            if vectorization == "Betti_Vectorization":
+                n = 0
+                while n < len(Ns):
+
+                    start = time.time()
+
+                    N = Ns[n]
+
+                    if suffix = "_all":
+                        output_csv_file = f"Betti_Vectorization_all_{N+1}_{which_R}.csv"
+                    elif suffix = "_V1":
+                        output_csv_file = f"Betti_Vectorization_V1_{N+1}_{which_R}.csv"
+                    elif suffix = "_V2":
+                        output_csv_file = f"Betti_Vectorization_V2_{N+1}_{which_R}.csv"
+                    elif suffix = "_V3":
+                        output_csv_file = f"Betti_Vectorization_V3_{N+1}_{which_R}.csv"
+                    elif suffix = "_V1_V2":
+                        output_csv_file = f"Betti_Vectorization_V1_V2_{N+1}_{which_R}.csv"
+                    elif suffix = "_V1_V3":
+                        output_csv_file = f"Betti_Vectorization_V1_V3_{N+1}_{which_R}.csv"
+                    elif suffix = "_V2_V3":
+                        output_csv_file = f"Betti_Vectorization_V2_V3_{N+1}_{which_R}.csv"
+                        
+                    which_one = output_csv_file.replace("Betti_Vectorization_","")
+                    with open(output_csv_file, "w", newline="") as f:
+                        writer = csv.writer(f)
+                                
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            j = 0
+                            while j < len(lead_s):
+                                lead = lead_s[j]
+                                pers_diagram = np.genfromtxt(f'{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = betti_fun(pers_diagram, dim, pat_id, lead, N)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = betti_fun(pers_diagram, dim, pat_id, lead, N)
+                                        dim = dim +1
+
+                                blah = put_together(part_0, part_1)
+                                blah.append(value)
+                                blah = np.array(blah)
+
+                                if suffix = "_all":
+                                    writer.writerow(blah)
+                                    j = j+1
+                                elif suffix = "_V1":
+                                    if lead == 'V1':
+                                        writer.writerow(blah)
+                                        j = j+1
+                                    else:
+                                        j = j+1
+                                elif suffix = "_V2":
+                                    if lead == 'V2':
+                                        writer.writerow(blah)
+                                        j = j+1
+                                    else:
+                                        j = j+1
+                                elif suffix = "_V3":
+                                    if lead == 'V3':
+                                        writer.writerow(blah)
+                                        j = j+1
+                                    else:
+                                        j = j+1
+                                elif suffix = "_V1_V2":
+                                    if lead == 'V1' or lead == 'V2':
+                                        writer.writerow(blah)
+                                        j = j+1
+                                    else:
+                                        j = j+1
+                                elif suffix = "_V1_V3":
+                                    if lead == 'V1' or lead == 'V3':
+                                        writer.writerow(blah)
+                                        j = j+1
+                                    else:
+                                        j = j+1
+                                elif suffix = "_V2_V3":
+                                    if lead == 'V2' or lead == 'V3':
+                                        writer.writerow(blah)
+                                        j = j+1
+                                    else:
+                                        j = j+1
+
+                            i = i+1
+                    
+                    time.sleep(1)
+                    end = time.time()
+
+                    print(f"Total runtime of the Betti Vectorization for {which_R} with N = {N+1} for {which_one} is {end - start} seconds")
+
+                    n = n+1
     
-    i = 0
-    while i < num_patients:
-        # print(num_patients - i)
-        pat_id = all_folder_names[i]
+            elif vectorization == "Pers_Vec_Vectorization":
 
-        x = np.searchsorted(annotation[:,0], float(pat_id))
+                start = time.time()
 
-        value = annotation[x,1]
+                if suffix = "_all":
+                    output_csv_file = f"Pers_Vec_Vectorization_all_{which_R}.csv"
+                elif suffix = "_V1":
+                    output_csv_file = f"Pers_Vec_Vectorization_V1_{which_R}.csv"
+                elif suffix = "_V2":
+                    output_csv_file = f"Pers_Vec_Vectorization_V2_{which_R}.csv"
+                elif suffix = "_V3":
+                    output_csv_file = f"Pers_Vec_Vectorization_V3_{which_R}.csv"
+                elif suffix = "_V1_V2":
+                    output_csv_file = f"Pers_Vec_Vectorization_V1_V2_{which_R}.csv"
+                elif suffix = "_V1_V3":
+                    output_csv_file = f"Pers_Vec_Vectorization_V1_V3_{which_R}.csv"
+                elif suffix = "_V2_V3":
+                    output_csv_file = f"Pers_Vec_Vectorization_V2_V3_{which_R}.csv"
+                    
+                which_one = output_csv_file.replace("Pers_Vec_Vectorization_","")
+                with open(output_csv_file, "w", newline="") as f:
+                    writer = csv.writer(f)
+                    writer.writerow(["Patient_ID", "lead", "Total 0 Count", "Total 0 area", "Total 1 Count", "Total 1 area", "Value"])
+                            
+                    i = 0
+                    while i < num_patients:
+                        pat_id = all_folder_names[i]
 
-        if value == 2: # This takes care of the places where you have a patient with Brugada + some other heart murmur.
-            i = i+1
-        else:
-            j = 0
-            while j < len(lead_s):
-                lead = lead_s[j]
-                pers_diagram = np.genfromtxt(f'Big_Output_thorough/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                        x = np.searchsorted(ann[:,0], float(pat_id))
 
-                dim = 0
-                while dim < 2:
-                    if dim == 0:
-                        part_0 = per_vec_dim_nocount(pers_diagram, dim)
-                        dim = dim +1
-                    else:
-                        part_1 = per_vec_dim_nocount(pers_diagram, dim)
-                        dim = dim +1
+                        value = ann[x,1]
 
-                blah = put_together(part_0, part_1)
-                info = [pat_id, lead]
-                blah = put_together(info, blah)
-                blah.append(value)
-                blah = np.array(blah)
+                        j = 0
+                        while j < len(lead_s):
+                            lead = lead_s[j]
+                            pers_diagram = np.genfromtxt(f'{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
-                if lead == 'V2' or lead == 'V3':
-                    writer.writerow(blah)
-                    j = j+1
-                else:
-                    j = j+1
+                            dim = 0
+                            while dim < 2:
+                                if dim == 0:
+                                    part_0 = per_vec_dim(pers_diagram, dim)
+                                    dim = dim +1
+                                else:
+                                    part_1 = per_vec_dim(pers_diagram, dim)
+                                    dim = dim +1
+                            
+                            blah = put_together(part_0, part_1)
+                            info = [pat_id, lead]
+                            blah = put_together(info, blah)
+                            blah.append(value)
+                            blah = np.array(blah)
 
-                # writer.writerow(blah)
-                # j = j+1
+                            if suffix = "_all":
+                                writer.writerow(blah)
+                                j = j+1
+                            elif suffix = "_V1":
+                                if lead == 'V1':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V2":
+                                if lead == 'V2':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V3":
+                                if lead == 'V3':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V1_V2":
+                                if lead == 'V1' or lead == 'V2':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V1_V3":
+                                if lead == 'V1' or lead == 'V3':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V2_V3":
+                                if lead == 'V2' or lead == 'V3':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
 
-            i = i+1
+                        i = i+1
+                    
+                    time.sleep(1)
+                    end = time.time()
 
-time.sleep(1)
-end = time.time()
+                    print(f"Total runtime of the Cumulative Persistence Vectorization for {which_R} for {which_one} is {end - start} seconds")
 
-print(f"Total runtime of the program is {end - start} seconds")
+            elif vectorization == "Pers_Vec_Vectorization_nooverlap":
 
+                start = time.time()
 
-######For Chaos for Persistence Vector no count without overlap##########
+                if suffix = "_all":
+                    output_csv_file = f"Pers_Vec_Vectorization_nooverlap_all_{which_R}.csv"
+                elif suffix = "_V1":
+                    output_csv_file = f"Pers_Vec_Vectorization_nooverlap_V1_{which_R}.csv"
+                elif suffix = "_V2":
+                    output_csv_file = f"Pers_Vec_Vectorization_nooverlap_V2_{which_R}.csv"
+                elif suffix = "_V3":
+                    output_csv_file = f"Pers_Vec_Vectorization_nooverlap_V3_{which_R}.csv"
+                elif suffix = "_V1_V2":
+                    output_csv_file = f"Pers_Vec_Vectorization_nooverlap_V1_V2_{which_R}.csv"
+                elif suffix = "_V1_V3":
+                    output_csv_file = f"Pers_Vec_Vectorization_nooverlap_V1_V3_{which_R}.csv"
+                elif suffix = "_V2_V3":
+                    output_csv_file = f"Pers_Vec_Vectorization_nooverlap_V2_V3_{which_R}.csv"
+                    
+                which_one = output_csv_file.replace("Pers_Vec_Vectorization_nooverlap_","")
+                with open(output_csv_file, "w", newline="") as f:
+                    writer = csv.writer(f)
+                    writer.writerow(["Patient_ID", "lead", "Total 0 Count", "Total 0 area", "Total 1 Count", "Total 1 area", "Value"])
+                            
+                    i = 0
+                    while i < num_patients:
+                        pat_id = all_folder_names[i]
 
-start = time.time()
+                        x = np.searchsorted(ann[:,0], float(pat_id))
 
-lead_s = ['V1', 'V2', 'V3']
+                        value = ann[x,1]
 
-get_to_files = Path('./Brugada_dataset/files')
+                        j = 0
+                        while j < len(lead_s):
+                            lead = lead_s[j]
+                            pers_diagram = np.genfromtxt(f'{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
-all_folder_names = []
+                            dim = 0
+                            while dim < 2:
+                                if dim == 0:
+                                    part_0 = per_vec_dim_overlap(pers_diagram, dim)
+                                    dim = dim +1
+                                else:
+                                    part_1 = per_vec_dim_overlap(pers_diagram, dim)
+                                    dim = dim +1
+                            
+                            blah = put_together(part_0, part_1)
+                            info = [pat_id, lead]
+                            blah = put_together(info, blah)
+                            blah.append(value)
+                            blah = np.array(blah)
 
-for subdir in get_to_files.iterdir(): # makes a list of all the files names (which are the patient numbers)
-    if subdir.is_dir():
-        all_folder_names.append(subdir.name)
+                            if suffix = "_all":
+                                writer.writerow(blah)
+                                j = j+1
+                            elif suffix = "_V1":
+                                if lead == 'V1':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V2":
+                                if lead == 'V2':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V3":
+                                if lead == 'V3':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V1_V2":
+                                if lead == 'V1' or lead == 'V2':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V1_V3":
+                                if lead == 'V1' or lead == 'V3':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V2_V3":
+                                if lead == 'V2' or lead == 'V3':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
 
-num_patients = len(all_folder_names)
+                        i = i+1
+                    
+                    time.sleep(1)
+                    end = time.time()
 
-annotation = np.genfromtxt('Brugada_dataset/metadata.csv', delimiter=',', skip_header=1)
+                    print(f"Total runtime of the Cumulative Persistence Vectorization no overlapping triangles for {which_R} for {which_one} is {end - start} seconds")
 
-annotation = np.array([annotation[:,0], annotation[:,3]]).T
+            elif vectorization == "Pers_Vec_Vectorization_nocount":
 
-# This while loop cycles through all the folders and thus all the patients in the 'Brugada/files' file.
+                start = time.time()
 
-output_csv_file = "Pers_Vec_Vectorization_nocount_nooverlap_V2_V3.csv"
-with open(output_csv_file, "w", newline="") as f:
-    writer = csv.writer(f)
-    writer.writerow(["Patient_ID", "lead", "Total 0 area", "Total 1 area", "Value"])
-    
-    i = 0
-    while i < num_patients:
-        # print(num_patients - i)
-        pat_id = all_folder_names[i]
+                if suffix = "_all":
+                    output_csv_file = f"Pers_Vec_Vectorization_nocount_all_{which_R}.csv"
+                elif suffix = "_V1":
+                    output_csv_file = f"Pers_Vec_Vectorization_nocount_V1_{which_R}.csv"
+                elif suffix = "_V2":
+                    output_csv_file = f"Pers_Vec_Vectorization_nocount_V2_{which_R}.csv"
+                elif suffix = "_V3":
+                    output_csv_file = f"Pers_Vec_Vectorization_nocount_V3_{which_R}.csv"
+                elif suffix = "_V1_V2":
+                    output_csv_file = f"Pers_Vec_Vectorization_nocount_V1_V2_{which_R}.csv"
+                elif suffix = "_V1_V3":
+                    output_csv_file = f"Pers_Vec_Vectorization_nocount_V1_V3_{which_R}.csv"
+                elif suffix = "_V2_V3":
+                    output_csv_file = f"Pers_Vec_Vectorization_nocount_V2_V3_{which_R}.csv"
+                    
+                which_one = output_csv_file.replace("Pers_Vec_Vectorization_nocount_","")
+                with open(output_csv_file, "w", newline="") as f:
+                    writer = csv.writer(f)
+                    writer.writerow(["Patient_ID", "lead", "Total 0 area", "Total 1 area", "Value"])
 
-        x = np.searchsorted(annotation[:,0], float(pat_id))
+                    i = 0
+                    while i < num_patients:
+                        pat_id = all_folder_names[i]
 
-        value = annotation[x,1]
+                        x = np.searchsorted(ann[:,0], float(pat_id))
 
-        if value == 2: # This takes care of the places where you have a patient with Brugada + some other heart murmur.
-            i = i+1
-        else:
-            j = 0
-            while j < len(lead_s):
-                lead = lead_s[j]
-                pers_diagram = np.genfromtxt(f'Big_Output_thorough/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                        value = ann[x,1]
 
-                dim = 0
-                while dim < 2:
-                    if dim == 0:
-                        part_0 = per_vec_dim_nocount_overlap(pers_diagram, dim)
-                        dim = dim +1
-                    else:
-                        part_1 = per_vec_dim_nocount_overlap(pers_diagram, dim)
-                        dim = dim +1
+                        j = 0
+                        while j < len(lead_s):
+                            lead = lead_s[j]
+                            pers_diagram = np.genfromtxt(f'{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
-                blah = put_together(part_0, part_1)
-                info = [pat_id, lead]
-                blah = put_together(info, blah)
-                blah.append(value)
-                blah = np.array(blah)
+                            dim = 0
+                            while dim < 2:
+                                if dim == 0:
+                                    part_0 = per_vec_dim_nocount(pers_diagram, dim)
+                                    dim = dim +1
+                                else:
+                                    part_1 = per_vec_dim_nocount(pers_diagram, dim)
+                                    dim = dim +1
+                            
+                            blah = put_together(part_0, part_1)
+                            info = [pat_id, lead]
+                            blah = put_together(info, blah)
+                            blah.append(value)
+                            blah = np.array(blah)
 
-                if lead == 'V2' or lead == 'V3':
-                    writer.writerow(blah)
-                    j = j+1
-                else:
-                    j = j+1
+                            if suffix = "_all":
+                                writer.writerow(blah)
+                                j = j+1
+                            elif suffix = "_V1":
+                                if lead == 'V1':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V2":
+                                if lead == 'V2':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V3":
+                                if lead == 'V3':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V1_V2":
+                                if lead == 'V1' or lead == 'V2':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V1_V3":
+                                if lead == 'V1' or lead == 'V3':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V2_V3":
+                                if lead == 'V2' or lead == 'V3':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
 
-                # writer.writerow(blah)
-                # j = j+1
+                        i = i+1
+                    
+                    time.sleep(1)
+                    end = time.time()
 
-            i = i+1
+                    print(f"Total runtime of the Cumulative Persistence Vectorization no count for {which_R} for {which_one} is {end - start} seconds")
 
-time.sleep(1)
-end = time.time()
+            elif vectorization == "Pers_Vec_Vectorization_nocount_nooverlap":
 
-print(f"Total runtime of the program is {end - start} seconds")
+                start = time.time()
+
+                if suffix = "_all":
+                    output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap_all_{which_R}.csv"
+                elif suffix = "_V1":
+                    output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap_V1_{which_R}.csv"
+                elif suffix = "_V2":
+                    output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap_V2_{which_R}.csv"
+                elif suffix = "_V3":
+                    output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap_V3_{which_R}.csv"
+                elif suffix = "_V1_V2":
+                    output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap_V1_V2_{which_R}.csv"
+                elif suffix = "_V1_V3":
+                    output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap_V1_V3_{which_R}.csv"
+                elif suffix = "_V2_V3":
+                    output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap_V2_V3_{which_R}.csv"
+                    
+                which_one = output_csv_file.replace("Pers_Vec_Vectorization_nocount_nooverlap_","")
+                with open(output_csv_file, "w", newline="") as f:
+                    writer = csv.writer(f)
+                    writer.writerow(["Patient_ID", "lead", "Total 0 area", "Total 1 area", "Value"])
+
+                    i = 0
+                    while i < num_patients:
+                        pat_id = all_folder_names[i]
+
+                        x = np.searchsorted(ann[:,0], float(pat_id))
+
+                        value = ann[x,1]
+
+                        j = 0
+                        while j < len(lead_s):
+                            lead = lead_s[j]
+                            pers_diagram = np.genfromtxt(f'{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                            dim = 0
+                            while dim < 2:
+                                if dim == 0:
+                                    part_0 = per_vec_dim_nocount_overlap(pers_diagram, dim)
+                                    dim = dim +1
+                                else:
+                                    part_1 = per_vec_dim_nocount_overlap(pers_diagram, dim)
+                                    dim = dim +1
+                            
+                            blah = put_together(part_0, part_1)
+                            info = [pat_id, lead]
+                            blah = put_together(info, blah)
+                            blah.append(value)
+                            blah = np.array(blah)
+
+                            if suffix = "_all":
+                                writer.writerow(blah)
+                                j = j+1
+                            elif suffix = "_V1":
+                                if lead == 'V1':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V2":
+                                if lead == 'V2':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V3":
+                                if lead == 'V3':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V1_V2":
+                                if lead == 'V1' or lead == 'V2':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V1_V3":
+                                if lead == 'V1' or lead == 'V3':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V2_V3":
+                                if lead == 'V2' or lead == 'V3':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+
+                        i = i+1
+                    
+                    time.sleep(1)
+                    end = time.time()
+
+                    print(f"Total runtime of the Cumulative Persistence Vectorization no count and no overlapping triangles for {which_R} for {which_one} is {end - start} seconds")
+            
+            elif vectorization == "Pers_Vec_Vectorization_noarea":
+
+                start = time.time()
+
+                if suffix = "_all":
+                    output_csv_file = f"Pers_Vec_Vectorization_noarea_all_{which_R}.csv"
+                elif suffix = "_V1":
+                    output_csv_file = f"Pers_Vec_Vectorization_noarea_V1_{which_R}.csv"
+                elif suffix = "_V2":
+                    output_csv_file = f"Pers_Vec_Vectorization_noarea_V2_{which_R}.csv"
+                elif suffix = "_V3":
+                    output_csv_file = f"Pers_Vec_Vectorization_noarea_V3_{which_R}.csv"
+                elif suffix = "_V1_V2":
+                    output_csv_file = f"Pers_Vec_Vectorization_noarea_V1_V2_{which_R}.csv"
+                elif suffix = "_V1_V3":
+                    output_csv_file = f"Pers_Vec_Vectorization_noarea_V1_V3_{which_R}.csv"
+                elif suffix = "_V2_V3":
+                    output_csv_file = f"Pers_Vec_Vectorization_noarea_V2_V3_{which_R}.csv"
+                    
+                which_one = output_csv_file.replace("Pers_Vec_Vectorization_noarea_","")
+                with open(output_csv_file, "w", newline="") as f:
+                    writer = csv.writer(f)
+                    writer.writerow(["Patient_ID", "lead", "Total 0 Count", "Total 1 Count", "Value"])
+
+                    i = 0
+                    while i < num_patients:
+                        pat_id = all_folder_names[i]
+
+                        x = np.searchsorted(ann[:,0], float(pat_id))
+
+                        value = ann[x,1]
+
+                        j = 0
+                        while j < len(lead_s):
+                            lead = lead_s[j]
+                            pers_diagram = np.genfromtxt(f'{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                            dim = 0
+                            while dim < 2:
+                                if dim == 0:
+                                    part_0 = per_vec_dim_noarea(pers_diagram, dim)
+                                    dim = dim +1
+                                else:
+                                    part_1 = per_vec_dim_noarea(pers_diagram, dim)
+                                    dim = dim +1
+                            
+                            blah = put_together(part_0, part_1)
+                            info = [pat_id, lead]
+                            blah = put_together(info, blah)
+                            blah.append(value)
+                            blah = np.array(blah)
+
+                            if suffix = "_all":
+                                writer.writerow(blah)
+                                j = j+1
+                            elif suffix = "_V1":
+                                if lead == 'V1':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V2":
+                                if lead == 'V2':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V3":
+                                if lead == 'V3':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V1_V2":
+                                if lead == 'V1' or lead == 'V2':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V1_V3":
+                                if lead == 'V1' or lead == 'V3':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+                            elif suffix = "_V2_V3":
+                                if lead == 'V2' or lead == 'V3':
+                                    writer.writerow(blah)
+                                    j = j+1
+                                else:
+                                    j = j+1
+
+                        i = i+1
+                    
+                    time.sleep(1)
+                    end = time.time()
+
+                    print(f"Total runtime of the Cumulative Persistence Vectorization no area for {which_R} for {which_one} is {end - start} seconds")
+        
+            el = el+1
+
+        r = r+1
+
+    c = c+1
