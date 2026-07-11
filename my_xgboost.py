@@ -66,8 +66,9 @@ Ns = [1, 5, 10, 100]
 # XGBoost parameters
 max_depths = 3
 learning_rates = 0.1
-nums = 50
+num = 50
 test_size = 0.20
+All_info_to_be_written = []
 
 r = 0
 while r < len(Rns):
