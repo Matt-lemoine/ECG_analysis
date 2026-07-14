@@ -1,11 +1,13 @@
-from sklearn.metrics import accuracy_score, confusion_matrix
-import xgboost as xgb
-from sklearn.model_selection import train_test_split
+# This is for LSSVM.
 
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.pyplot as plt
 import csv
+from sklearn.model_selection import train_test_split
+from neo_ls_svm import NeoLSSVM
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.model_selection import KFold, cross_val_score
 
 
 """
@@ -13,50 +15,23 @@ This file performs the training and testing for the XGBoost algorithm. The input
 
     The vecotrization files are saved in a folder labeled by the dimension you are embedding into using the SWE. Ex. "Vectorization_R2" is the
         folder having the vectorization of the persistent homology where the SWE is embedded in R^2.
-    By default the do_xgboost cycles through 5 choices of random states to get an average accuracy.
+    By default the do_lssvm cycles through 5 choices of random states to get an average accuracy.
 
 The output of this file is the accuracy for each of the vectorizations trained using the XGBoost model. This information is written to a CSV and saved as "All_Results_XGBoost.csv".
 """
 
 
 
-def do_xgboost(X, y, max_depth, learning_rate, num, test_size):
+def do_lssvm(X, y):
 
-    to_avg = []
-    random_state = 0
-    while random_state < 5:
+    model = NeoLSSVM(random_state=42)
+    scores = cross_val_score(model, X, y, cv = 5)
 
-        X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=test_size,  random_state=random_state)
-
-        xgb_train = xgb.DMatrix(X_train, y_train, enable_categorical=True)
-        xgb_test = xgb.DMatrix(X_test, y_test, enable_categorical=True)
-
-        params = {
-            'objective': 'binary:logistic',
-            'max_depth': max_depth,
-            'learning_rate': learning_rate,
-        }
-        num = num
-        model = xgb.train(params=params,dtrain=xgb_train,num_boost_round=num)
-
-        preds = model.predict(xgb_test)
-        preds = np.round(preds)
-
-        accuracy= accuracy_score(y_test, preds)
-
-        to_avg.append(accuracy)
-
-        random_state = random_state+1
-    
-    avg_accuracy = (sum(to_avg)/len(to_avg))*100
-
-    return avg_accuracy
+    return scores.mean()
 
 
 
-
-
-Rns = ['R2', 'R3', 'R4'] # If you have a specific R_n that you are interested in, specify that here.
+Rns = ['R2_w7', 'R3_w7', 'R4_w7'] # If you have a specific R_n that you are interested in, specify that here.
 
 Vectorizations = ['Betti_Vectorization', 'Pers_Vec_Vectorization', 'Pers_Vec_Vectorization_nooverlap', 'Pers_Vec_Vectorization_nocount', 'Pers_Vec_Vectorization_nocount_nooverlap', 'Pers_Vec_Vectorization_noarea']
 
@@ -64,11 +39,8 @@ ending_leads = ['_all', '_V1', '_V2', '_V3', '_V1_V2', '_V1_V3', '_V2_V3']
 
 Ns = [1, 5, 10, 100]
 
-# XGBoost parameters
-max_depths = 3
-learning_rates = 0.1
-num = 50
-test_size = 0.20
+# SVM parameters
+C_param = 1.0
 All_info_to_be_written = []
 
 r = 0
@@ -88,11 +60,11 @@ while r < len(Rns):
                 while i < len(Ns):
                     n = Ns[i]
 
-                    current_vec_title = Vec_title + suffix_lead + '_' + str(n) + f"_{R_n}"
+                    current_vec_title = Vec_title + suffix_lead + '_' + str(n)
                     current_vec = current_vec_title + '.csv'
 
                     csv_name = current_vec
-                    file = csv_name
+                    file = f'Vectorization_{R_n}_off1/{csv_name}'
 
                     print(file)
 
@@ -103,9 +75,9 @@ while r < len(Rns):
                     X = dataset.iloc[:, 0:max_col]
                     y = dataset.iloc[:, max_col].values
 
-                    avg_accuracy = do_xgboost(X, y, max_depth, learning_rate, num, test_size)
+                    avg_accuracy = do_lssvm(X, y)
                     
-                    print(f'Average accuracy over 5 random_states for {file} with N = {n} is: {avg_accuracy}')
+                    print(f'Average accuracy with 5-fold cross validation for {file} with N = {n} is: {avg_accuracy}')
 
                     All_info_to_be_written.append([current_vec_title, R_n, avg_accuracy])
 
@@ -113,11 +85,11 @@ while r < len(Rns):
 
             elif Vec_title == 'Pers_Vec_Vectorization' or Vec_title == 'Pers_Vec_Vectorization_nooverlap':
                 
-                current_vec_title = Vec_title + suffix_lead + f"_{R_n}"
+                current_vec_title = Vec_title + suffix_lead
                 current_vec = current_vec_title + '.csv'
 
                 csv_name = current_vec
-                file = csv_name
+                file = f'Vectorization_{R_n}/{csv_name}'
 
                 print(file)
 
@@ -128,19 +100,19 @@ while r < len(Rns):
                 X = dataset.iloc[:, 0:4]
                 y = dataset.iloc[:, 4].values
 
-                avg_accuracy = do_xgboost(X, y, max_depth, learning_rate, num, test_size)
+                avg_accuracy = do_lssvm(X, y)
 
-                print(f'Average accuracy over 5 random_states for {file} is: {avg_accuracy}')
+                print(f'Average accuracy with 5-fold cross validation for {file} is: {avg_accuracy}')
 
                 All_info_to_be_written.append([current_vec_title, R_n, avg_accuracy])
 
             elif Vec_title == 'Pers_Vec_Vectorization_nocount' or Vec_title =='Pers_Vec_Vectorization_nocount_nooverlap':
 
-                current_vec_title = Vec_title + suffix_lead + f"_{R_n}"
+                current_vec_title = Vec_title + suffix_lead
                 current_vec = current_vec_title + '.csv'
 
                 csv_name = current_vec
-                file = csv_name
+                file = f'Vectorization_{R_n}/{csv_name}'
 
                 print(file)
 
@@ -151,19 +123,19 @@ while r < len(Rns):
                 X = dataset.iloc[:, 0:2] 
                 y = dataset.iloc[:, 2].values
 
-                avg_accuracy = do_xgboost(X, y, max_depth, learning_rate, num, test_size)
+                avg_accuracy = do_lssvm(X, y)
 
-                print(f'Average accuracy over 5 random_states for {file} is: {avg_accuracy}')
+                print(f'Average accuracy with 5-fold cross validation for {file} is: {avg_accuracy}')
 
                 All_info_to_be_written.append([current_vec_title, R_n, avg_accuracy])
 
             elif Vec_title == 'Pers_Vec_Vectorization_noarea':
-
-                current_vec_title = Vec_title + suffix_lead + f"_{R_n}"
+                
+                current_vec_title = Vec_title + suffix_lead
                 current_vec = current_vec_title + '.csv'
 
                 csv_name = current_vec
-                file = csv_name
+                file = f'Vectorization_{R_n}/{csv_name}'
 
                 print(file)
 
@@ -173,9 +145,9 @@ while r < len(Rns):
                 X = dataset.iloc[:, 0:2] 
                 y = dataset.iloc[:, 2].values
 
-                avg_accuracy = do_xgboost(X, y, max_depth, learning_rate, num, test_size)
+                avg_accuracy = do_lssvm(X, y)
 
-                print(f'Average accuracy over 5 random_states for {file} is: {avg_accuracy}')
+                print(f'Average accuracy with 5-fold cross validation for {file} is: {avg_accuracy}')
 
                 All_info_to_be_written.append([current_vec_title, R_n, avg_accuracy])
 
@@ -187,7 +159,7 @@ while r < len(Rns):
 
 All_info_to_be_written = np.array(All_info_to_be_written)
 
-output_csv_file = f"All_Results_XGBoost.csv"
+output_csv_file = f"LSSVM_CSV_Results/All_Results_LSSVM.csv"
 with open(output_csv_file, "w", newline="") as f:
     writer = csv.writer(f)
     writer.writerow(["Vectorization_Method_and_lead", "R_n", "Accuracy"])
@@ -199,3 +171,4 @@ with open(output_csv_file, "w", newline="") as f:
         i = i+1
 
 print(f'################## Saved Results to {output_csv_file} ##################')
+

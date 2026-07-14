@@ -401,19 +401,19 @@ while c < len(Vectorizations):
 
                     N = Ns[n]
 
-                    if suffix = "_all":
+                    if suffix == "_all":
                         output_csv_file = f"Betti_Vectorization_all_{N+1}_{which_R}.csv"
-                    elif suffix = "_V1":
+                    elif suffix == "_V1":
                         output_csv_file = f"Betti_Vectorization_V1_{N+1}_{which_R}.csv"
-                    elif suffix = "_V2":
+                    elif suffix == "_V2":
                         output_csv_file = f"Betti_Vectorization_V2_{N+1}_{which_R}.csv"
-                    elif suffix = "_V3":
+                    elif suffix == "_V3":
                         output_csv_file = f"Betti_Vectorization_V3_{N+1}_{which_R}.csv"
-                    elif suffix = "_V1_V2":
+                    elif suffix == "_V1_V2":
                         output_csv_file = f"Betti_Vectorization_V1_V2_{N+1}_{which_R}.csv"
-                    elif suffix = "_V1_V3":
+                    elif suffix == "_V1_V3":
                         output_csv_file = f"Betti_Vectorization_V1_V3_{N+1}_{which_R}.csv"
-                    elif suffix = "_V2_V3":
+                    elif suffix == "_V2_V3":
                         output_csv_file = f"Betti_Vectorization_V2_V3_{N+1}_{which_R}.csv"
                         
                     which_one = output_csv_file.replace("Betti_Vectorization_","")
@@ -446,40 +446,40 @@ while c < len(Vectorizations):
                                 blah.append(value)
                                 blah = np.array(blah)
 
-                                if suffix = "_all":
+                                if suffix == "_all":
                                     writer.writerow(blah)
                                     j = j+1
-                                elif suffix = "_V1":
+                                elif suffix == "_V1":
                                     if lead == 'V1':
                                         writer.writerow(blah)
                                         j = j+1
                                     else:
                                         j = j+1
-                                elif suffix = "_V2":
+                                elif suffix == "_V2":
                                     if lead == 'V2':
                                         writer.writerow(blah)
                                         j = j+1
                                     else:
                                         j = j+1
-                                elif suffix = "_V3":
+                                elif suffix == "_V3":
                                     if lead == 'V3':
                                         writer.writerow(blah)
                                         j = j+1
                                     else:
                                         j = j+1
-                                elif suffix = "_V1_V2":
+                                elif suffix == "_V1_V2":
                                     if lead == 'V1' or lead == 'V2':
                                         writer.writerow(blah)
                                         j = j+1
                                     else:
                                         j = j+1
-                                elif suffix = "_V1_V3":
+                                elif suffix == "_V1_V3":
                                     if lead == 'V1' or lead == 'V3':
                                         writer.writerow(blah)
                                         j = j+1
                                     else:
                                         j = j+1
-                                elif suffix = "_V2_V3":
+                                elif suffix == "_V2_V3":
                                     if lead == 'V2' or lead == 'V3':
                                         writer.writerow(blah)
                                         j = j+1
@@ -499,19 +499,19 @@ while c < len(Vectorizations):
 
                 start = time.time()
 
-                if suffix = "_all":
+                if suffix == "_all":
                     output_csv_file = f"Pers_Vec_Vectorization_all_{which_R}.csv"
-                elif suffix = "_V1":
+                elif suffix == "_V1":
                     output_csv_file = f"Pers_Vec_Vectorization_V1_{which_R}.csv"
-                elif suffix = "_V2":
+                elif suffix == "_V2":
                     output_csv_file = f"Pers_Vec_Vectorization_V2_{which_R}.csv"
-                elif suffix = "_V3":
+                elif suffix == "_V3":
                     output_csv_file = f"Pers_Vec_Vectorization_V3_{which_R}.csv"
-                elif suffix = "_V1_V2":
+                elif suffix == "_V1_V2":
                     output_csv_file = f"Pers_Vec_Vectorization_V1_V2_{which_R}.csv"
-                elif suffix = "_V1_V3":
+                elif suffix == "_V1_V3":
                     output_csv_file = f"Pers_Vec_Vectorization_V1_V3_{which_R}.csv"
-                elif suffix = "_V2_V3":
+                elif suffix == "_V2_V3":
                     output_csv_file = f"Pers_Vec_Vectorization_V2_V3_{which_R}.csv"
                     
                 which_one = output_csv_file.replace("Pers_Vec_Vectorization_","")
@@ -547,40 +547,40 @@ while c < len(Vectorizations):
                             blah.append(value)
                             blah = np.array(blah)
 
-                            if suffix = "_all":
+                            if suffix == "_all":
                                 writer.writerow(blah)
                                 j = j+1
-                            elif suffix = "_V1":
+                            elif suffix == "_V1":
                                 if lead == 'V1':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V2":
+                            elif suffix == "_V2":
                                 if lead == 'V2':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V3":
+                            elif suffix == "_V3":
                                 if lead == 'V3':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V1_V2":
+                            elif suffix == "_V1_V2":
                                 if lead == 'V1' or lead == 'V2':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V1_V3":
+                            elif suffix == "_V1_V3":
                                 if lead == 'V1' or lead == 'V3':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V2_V3":
+                            elif suffix == "_V2_V3":
                                 if lead == 'V2' or lead == 'V3':
                                     writer.writerow(blah)
                                     j = j+1
@@ -598,19 +598,19 @@ while c < len(Vectorizations):
 
                 start = time.time()
 
-                if suffix = "_all":
+                if suffix == "_all":
                     output_csv_file = f"Pers_Vec_Vectorization_nooverlap_all_{which_R}.csv"
-                elif suffix = "_V1":
+                elif suffix == "_V1":
                     output_csv_file = f"Pers_Vec_Vectorization_nooverlap_V1_{which_R}.csv"
-                elif suffix = "_V2":
+                elif suffix == "_V2":
                     output_csv_file = f"Pers_Vec_Vectorization_nooverlap_V2_{which_R}.csv"
-                elif suffix = "_V3":
+                elif suffix == "_V3":
                     output_csv_file = f"Pers_Vec_Vectorization_nooverlap_V3_{which_R}.csv"
-                elif suffix = "_V1_V2":
+                elif suffix == "_V1_V2":
                     output_csv_file = f"Pers_Vec_Vectorization_nooverlap_V1_V2_{which_R}.csv"
-                elif suffix = "_V1_V3":
+                elif suffix == "_V1_V3":
                     output_csv_file = f"Pers_Vec_Vectorization_nooverlap_V1_V3_{which_R}.csv"
-                elif suffix = "_V2_V3":
+                elif suffix == "_V2_V3":
                     output_csv_file = f"Pers_Vec_Vectorization_nooverlap_V2_V3_{which_R}.csv"
                     
                 which_one = output_csv_file.replace("Pers_Vec_Vectorization_nooverlap_","")
@@ -646,40 +646,40 @@ while c < len(Vectorizations):
                             blah.append(value)
                             blah = np.array(blah)
 
-                            if suffix = "_all":
+                            if suffix == "_all":
                                 writer.writerow(blah)
                                 j = j+1
-                            elif suffix = "_V1":
+                            elif suffix == "_V1":
                                 if lead == 'V1':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V2":
+                            elif suffix == "_V2":
                                 if lead == 'V2':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V3":
+                            elif suffix == "_V3":
                                 if lead == 'V3':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V1_V2":
+                            elif suffix == "_V1_V2":
                                 if lead == 'V1' or lead == 'V2':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V1_V3":
+                            elif suffix == "_V1_V3":
                                 if lead == 'V1' or lead == 'V3':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V2_V3":
+                            elif suffix == "_V2_V3":
                                 if lead == 'V2' or lead == 'V3':
                                     writer.writerow(blah)
                                     j = j+1
@@ -697,19 +697,19 @@ while c < len(Vectorizations):
 
                 start = time.time()
 
-                if suffix = "_all":
+                if suffix == "_all":
                     output_csv_file = f"Pers_Vec_Vectorization_nocount_all_{which_R}.csv"
-                elif suffix = "_V1":
+                elif suffix == "_V1":
                     output_csv_file = f"Pers_Vec_Vectorization_nocount_V1_{which_R}.csv"
-                elif suffix = "_V2":
+                elif suffix == "_V2":
                     output_csv_file = f"Pers_Vec_Vectorization_nocount_V2_{which_R}.csv"
-                elif suffix = "_V3":
+                elif suffix == "_V3":
                     output_csv_file = f"Pers_Vec_Vectorization_nocount_V3_{which_R}.csv"
-                elif suffix = "_V1_V2":
+                elif suffix == "_V1_V2":
                     output_csv_file = f"Pers_Vec_Vectorization_nocount_V1_V2_{which_R}.csv"
-                elif suffix = "_V1_V3":
+                elif suffix == "_V1_V3":
                     output_csv_file = f"Pers_Vec_Vectorization_nocount_V1_V3_{which_R}.csv"
-                elif suffix = "_V2_V3":
+                elif suffix == "_V2_V3":
                     output_csv_file = f"Pers_Vec_Vectorization_nocount_V2_V3_{which_R}.csv"
                     
                 which_one = output_csv_file.replace("Pers_Vec_Vectorization_nocount_","")
@@ -745,40 +745,40 @@ while c < len(Vectorizations):
                             blah.append(value)
                             blah = np.array(blah)
 
-                            if suffix = "_all":
+                            if suffix == "_all":
                                 writer.writerow(blah)
                                 j = j+1
-                            elif suffix = "_V1":
+                            elif suffix == "_V1":
                                 if lead == 'V1':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V2":
+                            elif suffix == "_V2":
                                 if lead == 'V2':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V3":
+                            elif suffix == "_V3":
                                 if lead == 'V3':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V1_V2":
+                            elif suffix == "_V1_V2":
                                 if lead == 'V1' or lead == 'V2':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V1_V3":
+                            elif suffix == "_V1_V3":
                                 if lead == 'V1' or lead == 'V3':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V2_V3":
+                            elif suffix == "_V2_V3":
                                 if lead == 'V2' or lead == 'V3':
                                     writer.writerow(blah)
                                     j = j+1
@@ -796,19 +796,19 @@ while c < len(Vectorizations):
 
                 start = time.time()
 
-                if suffix = "_all":
+                if suffix == "_all":
                     output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap_all_{which_R}.csv"
-                elif suffix = "_V1":
+                elif suffix == "_V1":
                     output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap_V1_{which_R}.csv"
-                elif suffix = "_V2":
+                elif suffix == "_V2":
                     output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap_V2_{which_R}.csv"
-                elif suffix = "_V3":
+                elif suffix == "_V3":
                     output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap_V3_{which_R}.csv"
-                elif suffix = "_V1_V2":
+                elif suffix == "_V1_V2":
                     output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap_V1_V2_{which_R}.csv"
-                elif suffix = "_V1_V3":
+                elif suffix == "_V1_V3":
                     output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap_V1_V3_{which_R}.csv"
-                elif suffix = "_V2_V3":
+                elif suffix == "_V2_V3":
                     output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap_V2_V3_{which_R}.csv"
                     
                 which_one = output_csv_file.replace("Pers_Vec_Vectorization_nocount_nooverlap_","")
@@ -844,40 +844,40 @@ while c < len(Vectorizations):
                             blah.append(value)
                             blah = np.array(blah)
 
-                            if suffix = "_all":
+                            if suffix == "_all":
                                 writer.writerow(blah)
                                 j = j+1
-                            elif suffix = "_V1":
+                            elif suffix == "_V1":
                                 if lead == 'V1':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V2":
+                            elif suffix == "_V2":
                                 if lead == 'V2':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V3":
+                            elif suffix == "_V3":
                                 if lead == 'V3':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V1_V2":
+                            elif suffix == "_V1_V2":
                                 if lead == 'V1' or lead == 'V2':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V1_V3":
+                            elif suffix == "_V1_V3":
                                 if lead == 'V1' or lead == 'V3':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V2_V3":
+                            elif suffix == "_V2_V3":
                                 if lead == 'V2' or lead == 'V3':
                                     writer.writerow(blah)
                                     j = j+1
@@ -895,19 +895,19 @@ while c < len(Vectorizations):
 
                 start = time.time()
 
-                if suffix = "_all":
+                if suffix == "_all":
                     output_csv_file = f"Pers_Vec_Vectorization_noarea_all_{which_R}.csv"
-                elif suffix = "_V1":
+                elif suffix == "_V1":
                     output_csv_file = f"Pers_Vec_Vectorization_noarea_V1_{which_R}.csv"
-                elif suffix = "_V2":
+                elif suffix == "_V2":
                     output_csv_file = f"Pers_Vec_Vectorization_noarea_V2_{which_R}.csv"
-                elif suffix = "_V3":
+                elif suffix == "_V3":
                     output_csv_file = f"Pers_Vec_Vectorization_noarea_V3_{which_R}.csv"
-                elif suffix = "_V1_V2":
+                elif suffix == "_V1_V2":
                     output_csv_file = f"Pers_Vec_Vectorization_noarea_V1_V2_{which_R}.csv"
-                elif suffix = "_V1_V3":
+                elif suffix == "_V1_V3":
                     output_csv_file = f"Pers_Vec_Vectorization_noarea_V1_V3_{which_R}.csv"
-                elif suffix = "_V2_V3":
+                elif suffix == "_V2_V3":
                     output_csv_file = f"Pers_Vec_Vectorization_noarea_V2_V3_{which_R}.csv"
                     
                 which_one = output_csv_file.replace("Pers_Vec_Vectorization_noarea_","")
@@ -943,40 +943,40 @@ while c < len(Vectorizations):
                             blah.append(value)
                             blah = np.array(blah)
 
-                            if suffix = "_all":
+                            if suffix == "_all":
                                 writer.writerow(blah)
                                 j = j+1
-                            elif suffix = "_V1":
+                            elif suffix == "_V1":
                                 if lead == 'V1':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V2":
+                            elif suffix == "_V2":
                                 if lead == 'V2':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V3":
+                            elif suffix == "_V3":
                                 if lead == 'V3':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V1_V2":
+                            elif suffix == "_V1_V2":
                                 if lead == 'V1' or lead == 'V2':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V1_V3":
+                            elif suffix == "_V1_V3":
                                 if lead == 'V1' or lead == 'V3':
                                     writer.writerow(blah)
                                     j = j+1
                                 else:
                                     j = j+1
-                            elif suffix = "_V2_V3":
+                            elif suffix == "_V2_V3":
                                 if lead == 'V2' or lead == 'V3':
                                     writer.writerow(blah)
                                     j = j+1
