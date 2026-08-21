@@ -40,7 +40,6 @@ ending_leads = ['_all', '_V1', '_V2', '_V3', '_V1_V2', '_V1_V3', '_V2_V3']
 Ns = [1, 5, 10, 100]
 
 # SVM parameters
-C_param = 1.0
 All_info_to_be_written = []
 
 r = 0
