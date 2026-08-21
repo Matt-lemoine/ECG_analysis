@@ -97,5 +97,3 @@ def SWE_no_approx_with_CSV(ptf, lead, M, lb, ub): # for this function tau is not
     return projected_points
 
 
-
-SWE_no_approx_with_CSV(ptf, lead, M, lb, ub)
