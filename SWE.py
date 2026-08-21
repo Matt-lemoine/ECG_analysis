@@ -57,28 +57,6 @@ def save_plot_2d(projected_points, naming_things):
     print(f"Projected points saved as {naming_things}")
 
 """
-The following code will return a 3d plot of the projected wavelet. Here we fix M = 2.
-"""
-def SWE_plot_3d(ptf, lead_s, wavelet, level_decomp, tau, naming_things):
-    
-    M = 2
-
-    projected_points = get_points_nd(ptf, lead_s, wavelet, level_decomp, tau, M)
-    
-    return plot_3d(projected_points)
-
-"""
-The following code will return a 3d plot of the projected wavelet. Here we fix M = 1.
-"""
-def SWE_plot_2d(ptf, lead_s, wavelet, level_decomp, tau, naming_things):
-    
-    M = 1
-
-    projected_points = get_points_nd(ptf, lead_s, wavelet, level_decomp, tau, M)
-    
-    return plot_2d(projected_points)
-
-"""
 The following function performs the sliding window embedding of the ECGs by using the trimmed signal outlined in the "All_Trimming_info.csv" file.
 """
 
@@ -119,3 +97,5 @@ def SWE_no_approx_with_CSV(ptf, lead, M, lb, ub): # for this function tau is not
     return projected_points
 
 
+
+SWE_no_approx_with_CSV(ptf, lead, M, lb, ub)
