@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib as plt
+import pandas as pd
 import wfdb
 import matplotlib.pyplot as pyplt
 
@@ -95,58 +96,3 @@ def SWE_no_approx_with_CSV(ptf, lead, M, lb, ub): # for this function tau is not
             break
 
     return projected_points
-
-
-## Delete this later.
-
-def SWE_testing(ptf, lead, M, tau, lb, ub): # for this function tau is not defined because you just pick the next point in the ECG signal. So it is 1 or 0.01 sec.
-
-    # The default for this function is to break up the interval in which the trimmed EKG into 1 for each point 
-    #   in the original signal. So, if your trimmed signal has 802 points, then this will break up the interval
-    #   [0, 802] into 802 one unit pieces.
-
-    trimmed_signal = nekg.trim_by_CSV(ptf, lead, lb, ub)
-
-    n = len(trimmed_signal)
-
-    projected_points = []
-
-    i = 0
-    while i < n:
-        x = i
-        point = []
-        j = 0
-        while j <= M:
-            x_pro = x+j*tau
-            if x_pro > n-1:
-                point = []
-                i = n
-                break
-            else:
-                k = trimmed_signal[x_pro]
-                point.append(k)
-                j = j+1
-        
-        if point != []:
-            projected_points.append(point)
-            i = i+1
-        else:
-            break
-
-    save_plot_2d(projected_points, f"2d_tau_{tau}")
-
-    return projected_points
-
-
-taus = [1,5,10,15,20,25,30,35,40,45,50,55,60,65,70,72,74,75,76,78,80,85,90,95,100,105,110,115,120,125]
-ptf = "Brugada_dataset/files/286830/286830"
-lead_s = ["V2"]
-M = 1
-lb = 320
-ub = 848
-
-i = 0
-while i<len(taus):
-    tau = taus[i]
-    SWE_testing(ptf, lead_s, M, tau, lb, ub)
-    i = i+1
