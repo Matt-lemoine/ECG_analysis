@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as pyplt
 import wfdb
 import csv
@@ -77,13 +78,13 @@ def plot_og_trimmed_ekg(ptf, lead):
     pyplt.tight_layout()
     return pyplt.show()
 
-def trim_EKG_by_hand(ptf, lead, naming_things):
+# def trim_EKG_by_hand(ptf, lead, naming_things):
 
-    Lower_bound_trim = int(input(f"The lower bound of lead {lead} the trimmed EKG is "))
+#     Lower_bound_trim = int(input(f"The lower bound of lead {lead} the trimmed EKG is "))
 
-    Upper_bound_trim = int(input(f"The upper bound of lead {lead} the trimmed EKG is "))
+#     Upper_bound_trim = int(input(f"The upper bound of lead {lead} the trimmed EKG is "))
 
-    return [naming_things, lead, Lower_bound_trim, Upper_bound_trim]
+#     return [naming_things, lead, Lower_bound_trim, Upper_bound_trim]
 
 
 def trim_EKG(ptf, lead):
@@ -132,9 +133,34 @@ def trim_EKG(ptf, lead):
         print("It looks correct.")
         return trimmed_signal
 
-def trim_EKG_is_good(ptf, lead):
+# def trim_EKG_is_good(ptf, lead):
 
-    num_peaks = 6  # To edit the normalized num_peaks, edit here.
+#     num_peaks = 6  # To edit the normalized num_peaks, edit here.
+
+#     if len(lead) == 1:
+#         signal = vekg.get_EKG_leads(ptf, lead)
+#     else:
+#         error = 'You can only import one lead at a time for trim_EKG.'
+#         return print(error)
+
+#     valleys = find_valleys(ptf, lead)
+#     num_valleys = len(valleys)
+
+#     if num_valleys < num_peaks + 2:
+#         error = f"You need at least two more peaks in your reading than your valleys in order to trim, you have {num_valleys} valleys"
+#         return print(error)
+#     else:
+#         diff = num_valleys - num_peaks
+#         front_trim = diff // 2
+#         vall = valleys[front_trim - 1 : front_trim + num_peaks + 1]
+
+#     new_range = np.arange(min(vall), max(vall)+1, 1) # This picks out the new range of your signal
+
+#     trimmed_signal = signal[new_range] # This gets the trimmed ekg values from signal.
+
+#     return trimmed_signal
+
+def trim_by_CSV(ptf, lead):
 
     if len(lead) == 1:
         signal = vekg.get_EKG_leads(ptf, lead)
@@ -142,30 +168,7 @@ def trim_EKG_is_good(ptf, lead):
         error = 'You can only import one lead at a time for trim_EKG.'
         return print(error)
 
-    valleys = find_valleys(ptf, lead)
-    num_valleys = len(valleys)
-
-    if num_valleys < num_peaks + 2:
-        error = f"You need at least two more peaks in your reading than your valleys in order to trim, you have {num_valleys} valleys"
-        return print(error)
-    else:
-        diff = num_valleys - num_peaks
-        front_trim = diff // 2
-        vall = valleys[front_trim - 1 : front_trim + num_peaks + 1]
-
-    new_range = np.arange(min(vall), max(vall)+1, 1) # This picks out the new range of your signal
-
-    trimmed_signal = signal[new_range] # This gets the trimmed ekg values from signal.
-
-    return trimmed_signal
-
-def trim_by_CSV(ptf, lead, lb, ub):
-
-    if len(lead) == 1:
-        signal = vekg.get_EKG_leads(ptf, lead)
-    else:
-        error = 'You can only import one lead at a time for trim_EKG.'
-        return print(error)
+    lb, ub = find_bounds(ptf, lead)
 
     new_range = np.arange(lb, ub+1, 1) # This picks out the new range of your signal
 
@@ -210,7 +213,7 @@ def trim_by_hand(ptf, lead):
         
     return trimmed_signal
 
-def trim_EKG_bounds(ptf, lead):
+def trim_EKG_bounds(ptf, lead): # This code was used to trim the ekg's by hand using images and pyplots of them. It uses the find_valleys to get a good start.
 
     def trim_by_hand_in_trim_EKG(ptf, lead):
 
@@ -303,3 +306,20 @@ def trim_EKG_bounds(ptf, lead):
         print("It looks correct.")
         return lb_ub
 
+def find_bounds(ptf, lead):
+
+    trimming_info = pd.read_csv("All_Trimming_info.csv")
+    trimming_info = np.array(trimming_info)
+
+    pat_id = ptf.split("/",3)[-1]
+
+    index = trimming_info[:,0] == float(pat_id)
+    matching_rows = trimming_info[index]
+
+    index = matching_rows[:,1] == lead
+    matching_rows = matching_rows[index]
+
+    lb = matching_rows[0,2]
+    ub = matching_rows[0,3]
+
+    return lb, ub

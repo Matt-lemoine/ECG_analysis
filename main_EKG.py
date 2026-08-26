@@ -40,10 +40,6 @@ for subdir in get_to_files.iterdir(): # makes a list of all the files names (whi
 num_patients = len(all_folder_names)
 
 
-# Load the CSV of trimming bounds as outlined in the All_Trimming_info.csv file.
-trimming_info = pd.read_csv("All_Trimming_info.csv")
-trimming_info = np.array(trimming_info)
-
 cycle = 0
 while cycle < num_patients: # Cycles through patients.
 
@@ -65,52 +61,57 @@ while cycle < num_patients: # Cycles through patients.
         
         "Step 2: Normalize EKG signal"
 
-        # There is no option to edit this from main_EKG.py. To edit any aspect of the normalization you must go to Normalize_EKG.py and edit there.
-        # We have made a choice to pick out the middle-most 6 peaks from the EKG reading. This can be edited in the trim_EKG function.
+        # In this normalize_EKG file, it trims the EKG, then approximates the trimmed EKG with Splines, then passes to the SWE.
         
-        "Step 3: Get the bounds for trimming"
+        "Step 3: SWE"
 
-        index = trimming_info[:,0] == float(all_folder_names[cycle])
-        matching_rows = trimming_info[index]
-
-        index = matching_rows[:,1] == lead_s[leads_to_cycle_through]
-        matching_rows = matching_rows[index]
-
-        lb = matching_rows[0,2]
-        ub = matching_rows[0,3]
-        
-        "Step 4: SWE"
-
-        # tau is fixed as 1 ms in the SWE.py file.
         M = 1
+        while M < 4:
 
-        pro_points = swe.SWE_no_approx_with_CSV(ptf, lead_in_cycle, M, lb, ub)
-        projected_points = np.array(pro_points)
+            pro_points = swe.SWE_w_Splines(ptf, lead_in_cycle, M)
+            projected_points = np.array(pro_points)
 
-        print(f"Performed Sliding Window Embedding. Shape = {projected_points.shape}. Now moving to Persistent Homology.")
+            print(f"Performed Sliding Window Embedding. Shape = {projected_points.shape}. Now moving to Persistent Homology.")
 
-        "Step 5: Persistent Homology of SWE point cloud"
+            if len(projected_points) != 615:
+                "There is a huge error there should only be 615 points."
+                break
 
-        output_csv_name = f"{naming_things}_pers_info"
-        output_file_graph = f"{naming_things}_pers_diagram"
+            "Step 4: Persistent Homology of SWE point cloud"
 
-        max_dimension = 2           # This means we will look for the persistent homology for dimensions 0 and 1.
-        max_edge_length = 1.5
+            folder = f"Persistent_Homology_R{M+1}"
+            output_csv_name = f"{naming_things}_pers_info"
+            output_file_graph = f"{folder}/{naming_things}_pers_diagram"
 
-        persistence = cc.construct_calculate(projected_points, max_dimension, max_edge_length, output_csv_name)
+            max_dimension = 2           # This means we will look for the persistent homology for dimensions 0 and 1.
+            max_edge_length = 6
 
-        try:
-            cc.persistence_graph(persistence, output_file_graph)
-        except Exception as e:
-            print(f"An error occurred during the persistence graph: {e}")
+            persistence = cc.construct_calculate(projected_points, max_dimension, max_edge_length, output_csv_name, folder)
 
-        print("Persistence Calculated")
+            try:
+                cc.persistence_graph(persistence, output_file_graph)
+            except Exception as e:
+                print(f"An error occurred during the persistence graph: {e}")
+
+            print("Persistence Calculated")
+
+            M = M+1
+
+        if M != 4:
+            break
 
         print(f"END looking at lead {lead_s[leads_to_cycle_through]}")
 
         leads_to_cycle_through += 1
 
-    time_left = (num_patients - cycle -1)*2.5
+    if leads_to_cycle_through!=3:
+        break
+
+    time_left = (num_patients - cycle -1)*7.5
     print(f"****** END ****** looking at patient {all_folder_names[cycle]}. Patient {cycle + 1}/{num_patients}. Approximately {time_left} minutes left.")
 
     cycle += 1
+
+if cycle != 363:
+
+    "There was a big mistake somewhere. oops"

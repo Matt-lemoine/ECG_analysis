@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 plt.rcParams['text.usetex'] = False #so we do not get the LaTeX error
 import csv
 
-def construct_calculate(data_array, max_dimension, max_edge_length, csv_file_name):
+def construct_calculate(data_array, max_dimension, max_edge_length, csv_file_name, folder):
     """
     Constructs a Vietoris-Rips complex, computes persistence, and visualizes the persistence diagram.
     
@@ -33,7 +33,7 @@ def construct_calculate(data_array, max_dimension, max_edge_length, csv_file_nam
         csv_file_name_nocsv = csv_file_name.replace(".csv","")
 
         # The below piece does just the times for all the features and records it to a csv.
-        output_csv_file = f"{csv_file_name_nocsv}_all_dimensions_simple.csv"
+        output_csv_file = f"{folder}/{csv_file_name_nocsv}_all_dimensions_simple.csv"
         print(f"Writing birth-death info to {output_csv_file}")
         with open(output_csv_file, "w", newline="") as f:
             writer = csv.writer(f)
