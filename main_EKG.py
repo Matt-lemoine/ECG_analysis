@@ -79,7 +79,7 @@ while cycle < num_patients: # Cycles through patients.
 
             "Step 4: Persistent Homology of SWE point cloud"
 
-            folder = f"Persistent_Homology_R{M+1}"
+            folder = f"Persistent_Homology_R{M+1}/{lead_s[leads_to_cycle_through]}"
             output_csv_name = f"{naming_things}_pers_info"
             output_file_graph = f"{folder}/{naming_things}_pers_diagram"
 
@@ -107,7 +107,7 @@ while cycle < num_patients: # Cycles through patients.
     if leads_to_cycle_through!=3:
         break
 
-    time_left = (num_patients - cycle -1)*7.5
+    time_left = (num_patients - cycle -1)*4
     print(f"****** END ****** looking at patient {all_folder_names[cycle]}. Patient {cycle + 1}/{num_patients}. Approximately {time_left} minutes left.")
 
     cycle += 1
