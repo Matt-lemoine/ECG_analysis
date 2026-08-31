@@ -78,14 +78,6 @@ def plot_og_trimmed_ekg(ptf, lead):
     pyplt.tight_layout()
     return pyplt.show()
 
-# def trim_EKG_by_hand(ptf, lead, naming_things):
-
-#     Lower_bound_trim = int(input(f"The lower bound of lead {lead} the trimmed EKG is "))
-
-#     Upper_bound_trim = int(input(f"The upper bound of lead {lead} the trimmed EKG is "))
-
-#     return [naming_things, lead, Lower_bound_trim, Upper_bound_trim]
-
 
 def trim_EKG(ptf, lead):
 
@@ -132,86 +124,7 @@ def trim_EKG(ptf, lead):
     else:
         print("It looks correct.")
         return trimmed_signal
-
-# def trim_EKG_is_good(ptf, lead):
-
-#     num_peaks = 6  # To edit the normalized num_peaks, edit here.
-
-#     if len(lead) == 1:
-#         signal = vekg.get_EKG_leads(ptf, lead)
-#     else:
-#         error = 'You can only import one lead at a time for trim_EKG.'
-#         return print(error)
-
-#     valleys = find_valleys(ptf, lead)
-#     num_valleys = len(valleys)
-
-#     if num_valleys < num_peaks + 2:
-#         error = f"You need at least two more peaks in your reading than your valleys in order to trim, you have {num_valleys} valleys"
-#         return print(error)
-#     else:
-#         diff = num_valleys - num_peaks
-#         front_trim = diff // 2
-#         vall = valleys[front_trim - 1 : front_trim + num_peaks + 1]
-
-#     new_range = np.arange(min(vall), max(vall)+1, 1) # This picks out the new range of your signal
-
-#     trimmed_signal = signal[new_range] # This gets the trimmed ekg values from signal.
-
-#     return trimmed_signal
-
-def trim_by_CSV(ptf, lead):
-
-    if len(lead) == 1:
-        signal = vekg.get_EKG_leads(ptf, lead)
-    else:
-        error = 'You can only import one lead at a time for trim_EKG.'
-        return print(error)
-
-    lb, ub = find_bounds(ptf, lead)
-
-    new_range = np.arange(lb, ub+1, 1) # This picks out the new range of your signal
-
-    trimmed_signal = signal[new_range] # This gets the trimmed ekg values from signal.
-        
-    return trimmed_signal
-
-
-def trim_by_hand(ptf, lead):
-
-    lb = int(input("What is the lower bound for your trim? "))
-    ub = int(input("What is the upper bound for your trim? "))
-
-    if len(lead) == 1:
-        signal = vekg.get_EKG_leads(ptf, lead)
-    else:
-        error = 'You can only import one lead at a time for trim_EKG.'
-        return print(error)
-
-    new_range = np.arange(lb, ub+1, 1) # This picks out the new range of your signal
-
-    trimmed_signal = signal[new_range] # This gets the trimmed ekg values from signal.
-
-    pyplt.clf()
-    pyplt.subplot(2, 1, 1) # This is the first of l plots in the first column
-    pyplt.plot(signal)
-    pyplt.title(f"Original Signal {ptf}")
-
-    pyplt.subplot(2, 1, 2)
-    pyplt.plot(trimmed_signal)
-    pyplt.title("Trimmed signal")
-
-    pyplt.tight_layout()
-    pyplt.savefig("Test_Trim.png")
-
-    yes_no = input("Does Test_Trim.png look correct? (y/n): ")
-
-    if yes_no == "n":
-        print("If it doesn't look correct, you messed up the trimming.")
-    else:
-        print("It looks correct.")
-        
-    return trimmed_signal
+    
 
 def trim_EKG_bounds(ptf, lead): # This code was used to trim the ekg's by hand using images and pyplots of them. It uses the find_valleys to get a good start.
 
@@ -306,6 +219,7 @@ def trim_EKG_bounds(ptf, lead): # This code was used to trim the ekg's by hand u
         print("It looks correct.")
         return lb_ub
 
+
 def find_bounds(ptf, lead):
 
     trimming_info = pd.read_csv("All_Trimming_info.csv")
@@ -323,3 +237,20 @@ def find_bounds(ptf, lead):
     ub = matching_rows[0,3]
 
     return lb, ub
+
+
+def trim_by_CSV(ptf, lead):
+
+    if len(lead) == 1:
+        signal = vekg.get_EKG_leads(ptf, lead)
+    else:
+        error = 'You can only import one lead at a time for trim_EKG.'
+        return print(error)
+
+    lb, ub = find_bounds(ptf, lead)
+
+    new_range = np.arange(lb, ub+1, 1) # This picks out the new range of your signal
+
+    trimmed_signal = signal[new_range] # This gets the trimmed ekg values from signal.
+        
+    return trimmed_signal
