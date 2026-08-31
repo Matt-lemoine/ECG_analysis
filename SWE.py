@@ -103,24 +103,30 @@ def SWE_no_approx_with_CSV(ptf, lead, M, lb, ub): # for this function tau is not
 The following definition performs the Spline approximation so that all the trimmed EKGs have the same number of points in the SWE.
 """
 
-def SWE_w_Splines(ptf, lead, M):
+def SWE_w_Splines(ptf, lead, tau, M):
 
     fun, n = sapp.get_cs_trimmed_signal(ptf, lead)
 
-    number_of_swe_points = 615 # This number is arbitrary, but is chosen from the average length of the trimmed signals being 615.45
+    print(n)
 
-    tau = n/number_of_swe_points
+    tau = tau
+
+    num_samp = n - tau* M # This gives you enough room to make the 615 samples in each dimension and to sample a few different tau values.
+
+    number_of_swe_points = 615 # Chosen from the average length of the trimmed signals being 615.45
+
+    sliding_by = num_samp/number_of_swe_points # This number tells you how much you need to slide over along the interval so that you have 615 points total.
 
     projected_points = []
 
     i = 0
     while i < number_of_swe_points:
-        x = i
+        x = i * sliding_by
         point = []
         j = 0
         while j <= M:
             x_pro = x+(j*tau)
-            if x_pro > n-1:
+            if x_pro >= n:
                 point = []
                 i = number_of_swe_points
                 break
@@ -179,20 +185,54 @@ def SWE_w_Splines(ptf, lead, M):
 #     return projected_points
 
 
-# taus = [1]
-# ptf = "Brugada_dataset/files/286830/286830"
-# lead_s = ["V2"]
-# M = 2
-# lb = 320
-# ub = 848
+# files = [1423789, 1274776, 1286512]
+# lead_s = [str('V1'), 'V2', 'V3']
+# Ms = [1,2,3]
 
-# # print(nekg.find_bounds(ptf, lead_s))
+# taus = [0.5, 1, 1.5, 2, 5, 10]
 
 # i = 0
-# while i<len(taus):
-#     tau = taus[i]
-#     SWE_w_Splines(ptf, lead_s, M)
+# while i<len(files):
+#     ptf = "Brugada_dataset/files/"
+#     file = files[i]
+
+#     ptf = ptf + f"{file}/{file}"
+
+#     print(ptf)
+
+#     j = 0
+#     while j < len(lead_s):
+#         lead = [lead_s[j]]
+
+#         print(lead)
+
+#         k = 0
+#         while k < len(Ms):
+#             M = Ms[k]
+
+#             print(M)
+
+#             t = 0
+#             while t < len(taus):
+#                 tau = taus[t]
+
+#                 points = SWE_w_Splines(ptf, lead, tau, M)
+
+#                 if M == 1:
+#                     plot_2d(points)
+#                     t = t+1
+#                 elif M == 2:
+#                     plot_3d(points)
+#                     t = t+1
+#                 else:
+#                     t = t+1
+
+#             k = k+1
+
+#         j = j+1
+
 #     i = i+1
+
 
 # # trimming_info = pd.read_csv("All_Trimming_info.csv")
 # # trimming_info = np.array(trimming_info)

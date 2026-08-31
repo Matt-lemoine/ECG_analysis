@@ -39,7 +39,6 @@ for subdir in get_to_files.iterdir(): # makes a list of all the files names (whi
 
 num_patients = len(all_folder_names)
 
-
 cycle = 0
 while cycle < num_patients: # Cycles through patients.
 
@@ -65,16 +64,18 @@ while cycle < num_patients: # Cycles through patients.
         
         "Step 3: SWE"
 
+        tau = 1 # tau=1 is arbitrary, but after testing a few different tau's, taus between 0.75 and 2 gave similar projections.
+
         M = 1
         while M < 4:
 
-            pro_points = swe.SWE_w_Splines(ptf, lead_in_cycle, M)
+            pro_points = swe.SWE_w_Splines(ptf, lead_in_cycle, tau, M)
             projected_points = np.array(pro_points)
 
             print(f"Performed Sliding Window Embedding. Shape = {projected_points.shape}. Now moving to Persistent Homology.")
 
             if len(projected_points) != 615:
-                "There is a huge error there should only be 615 points."
+                print("There is a huge error there should only be 615 points.")
                 break
 
             "Step 4: Persistent Homology of SWE point cloud"
@@ -114,4 +115,4 @@ while cycle < num_patients: # Cycles through patients.
 
 if cycle != 363:
 
-    "There was a big mistake somewhere. oops"
+    print("There was a big mistake somewhere. oops")
