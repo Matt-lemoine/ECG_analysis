@@ -25,6 +25,7 @@ def area_of_tri(b,d):
 
     return area
 
+
 def area_of_trap(d_1, b_2, d_2):
 
     # This is only for when the b_2 < d_1. If b_2 >= d_2, then use area_of_tri.
@@ -39,7 +40,12 @@ def area_of_trap(d_1, b_2, d_2):
     return area
 
 
-def per_vec_dim(persistence_diagram, dimension): # This the the regular PCV where you do not consider the ovelapping triangles.
+"""
+In all the following vectorization methods, the persistence diagram is assumed to be imprted as an np.array.
+"""
+
+
+def per_vec_dim(persistence_diagram, dimension): # This the the regular CPV where you do not consider the ovelapping triangles.
 
     count = 0
     total_area = 0
@@ -59,7 +65,8 @@ def per_vec_dim(persistence_diagram, dimension): # This the the regular PCV wher
     
     return [count, total_area]
 
-def per_vec_dim_noarea(persistence_diagram, dimension):
+
+def per_vec_dim_noarea(persistence_diagram, dimension): # This is the CPV (no area) which is equivalent to the BV (N=1).
 
     count = 0
 
@@ -73,9 +80,8 @@ def per_vec_dim_noarea(persistence_diagram, dimension):
     
     return [count]
 
-def per_vec_dim_nocount(persistence_diagram, dimension):
 
-    # persistence_diagram is a np.array
+def per_vec_dim_nocount(persistence_diagram, dimension): # This is the CPV (no count).
 
     total_area = 0
 
@@ -93,9 +99,8 @@ def per_vec_dim_nocount(persistence_diagram, dimension):
     
     return [total_area]
 
-def per_vec_dim_overlap(persistence_diagram, dimension): # This is the PCV where you do consider the overlapping triangles.
 
-    # persistence_diagram is a np.array
+def per_vec_dim_overlap(persistence_diagram, dimension): # This is the CPV (no overlap) where you do consider the overlapping triangles.
 
     count = 0
     total_area = 0
@@ -167,9 +172,8 @@ def per_vec_dim_overlap(persistence_diagram, dimension): # This is the PCV where
         
     return [count, total_area]
 
-def per_vec_dim_nocount_overlap(persistence_diagram, dimension):
 
-    # persistence_diagram is a np.array
+def per_vec_dim_nocount_overlap(persistence_diagram, dimension): # This is the CPV (No overlap and no count).
 
     total_area = 0
 
@@ -235,7 +239,8 @@ def per_vec_dim_nocount_overlap(persistence_diagram, dimension):
         
     return [total_area]
 
-def betti_fun(persistence_diagram, dimension, pat_id, lead, N):
+
+def betti_fun(persistence_diagram, dimension, pat_id, lead, N): # This is to get the discretized Betti Curve as a vector.
 
     i = 0
     bs = []
@@ -330,7 +335,6 @@ def put_together(thing_1, thing_2):
             output.append(thing_2[i-l1])
             i = i+1
         else:
-            print('you messed up dude.')
             i = i+1
     
     return output
@@ -379,6 +383,8 @@ while a < len(annotation):
 
 ann = np.array(ann)
 
+times = []
+
 c = 0
 while c < len(Vectorizations):
     vectorization = Vectorizations[c]
@@ -401,25 +407,300 @@ while c < len(Vectorizations):
 
                     N = Ns[n]
 
-                    if suffix == "_all":
-                        output_csv_file = f"Betti_Vectorization_all_{N+1}_{which_R}.csv"
-                    elif suffix == "_V1":
-                        output_csv_file = f"Betti_Vectorization_V1_{N+1}_{which_R}.csv"
-                    elif suffix == "_V2":
-                        output_csv_file = f"Betti_Vectorization_V2_{N+1}_{which_R}.csv"
-                    elif suffix == "_V3":
-                        output_csv_file = f"Betti_Vectorization_V3_{N+1}_{which_R}.csv"
-                    elif suffix == "_V1_V2":
-                        output_csv_file = f"Betti_Vectorization_V1_V2_{N+1}_{which_R}.csv"
-                    elif suffix == "_V1_V3":
-                        output_csv_file = f"Betti_Vectorization_V1_V3_{N+1}_{which_R}.csv"
-                    elif suffix == "_V2_V3":
-                        output_csv_file = f"Betti_Vectorization_V2_V3_{N+1}_{which_R}.csv"
+                    output_csv_file = f"Betti_Vectorization{suffix}_{N+1}_{which_R}.csv"
                         
                     which_one = output_csv_file.replace("Betti_Vectorization_","")
                     with open(output_csv_file, "w", newline="") as f:
                         writer = csv.writer(f)
-                                
+
+                        if suffix == "_all":
+
+                            i = 0
+                            while i < num_patients:
+                                pat_id = all_folder_names[i]
+
+                                x = np.searchsorted(ann[:,0], float(pat_id))
+
+                                value = ann[x,1]
+
+                                j = 0
+                                while j < len(lead_s):
+                                    lead = lead_s[j]
+                                    pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                    dim = 0
+                                    while dim < 2:
+                                        if dim == 0:
+                                            part_0 = betti_fun(pers_diagram, dim, pat_id, lead, N)
+                                            dim = dim +1
+                                        else:
+                                            part_1 = betti_fun(pers_diagram, dim, pat_id, lead, N)
+                                            dim = dim +1
+
+                                    if j == 0:
+                                        cpv = put_together(part_0, part_1)
+                                        info = [pat_id]
+                                        info_cpv = put_together(info, cpv)
+                                    elif j == 1:
+                                        cpv = put_together(part_0, part_1)
+                                        info_cpv = put_together(info_cpv, cpv)
+                                    elif j == 2:
+                                        cpv = put_together(part_0, part_1)
+                                        info_cpv = put_together(info_cpv, cpv)
+                                        info_cpv.append(value)
+                                        info_cpv = np.array(info_cpv)
+
+                                    j = j+1
+
+                                writer.writerow(info_cpv)
+
+                                i = i+1
+
+                        elif suffix == "_V1":
+
+                            i = 0
+                            while i < num_patients:
+                                pat_id = all_folder_names[i]
+
+                                x = np.searchsorted(ann[:,0], float(pat_id))
+
+                                value = ann[x,1]
+
+                                lead = "V1"
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = betti_fun(pers_diagram, dim, pat_id, lead, N)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = betti_fun(pers_diagram, dim, pat_id, lead, N)
+                                        dim = dim +1
+
+                                cpv = put_together(part_0, part_1)
+                                info = [pat_id]
+                                info_cpv = put_together(info, cpv)
+                                info_cpv.append(value)
+                                info_cpv = np.array(info_cpv)
+
+                                writer.writerow(info_cpv)
+
+                                i = i+1
+
+                        elif suffix == "_V2":
+
+                            i = 0
+                            while i < num_patients:
+                                pat_id = all_folder_names[i]
+
+                                x = np.searchsorted(ann[:,0], float(pat_id))
+
+                                value = ann[x,1]
+
+                                lead = "V2"
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = betti_fun(pers_diagram, dim, pat_id, lead, N)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = betti_fun(pers_diagram, dim, pat_id, lead, N)
+                                        dim = dim +1
+
+                                cpv = put_together(part_0, part_1)
+                                info = [pat_id]
+                                info_cpv = put_together(info, cpv)
+                                info_cpv.append(value)
+                                info_cpv = np.array(info_cpv)
+
+                                writer.writerow(info_cpv)
+
+                                i = i+1
+
+                        elif suffix == "_V3":
+
+                            i = 0
+                            while i < num_patients:
+                                pat_id = all_folder_names[i]
+
+                                x = np.searchsorted(ann[:,0], float(pat_id))
+
+                                value = ann[x,1]
+
+                                lead = "V3"
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = betti_fun(pers_diagram, dim, pat_id, lead, N)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = betti_fun(pers_diagram, dim, pat_id, lead, N)
+                                        dim = dim +1
+
+                                cpv = put_together(part_0, part_1)
+                                info = [pat_id]
+                                info_cpv = put_together(info, cpv)
+                                info_cpv.append(value)
+                                info_cpv = np.array(info_cpv)
+
+                                writer.writerow(info_cpv)
+
+                                i = i+1
+
+                        elif suffix == "_V1_V2":
+
+                            i = 0
+                            while i < num_patients:
+                                pat_id = all_folder_names[i]
+
+                                x = np.searchsorted(ann[:,0], float(pat_id))
+
+                                value = ann[x,1]
+
+                                lead_s = ["V1", "V2"]
+
+                                j = 0
+                                while j < len(lead_s):
+                                    lead = lead_s[j]
+                                    pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                    dim = 0
+                                    while dim < 2:
+                                        if dim == 0:
+                                            part_0 = betti_fun(pers_diagram, dim, pat_id, lead, N)
+                                            dim = dim +1
+                                        else:
+                                            part_1 = betti_fun(pers_diagram, dim, pat_id, lead, N)
+                                            dim = dim +1
+
+                                    if j == 0:
+                                        cpv = put_together(part_0, part_1)
+                                        info = [pat_id]
+                                        info_cpv = put_together(info, cpv)
+                                    elif j == 1:
+                                        cpv = put_together(part_0, part_1)
+                                        info_cpv = put_together(info_cpv, cpv)
+                                        info_cpv.append(value)
+                                        info_cpv = np.array(info_cpv)
+
+                                    j = j+1
+
+                                writer.writerow(info_cpv)
+
+                                i = i+1
+
+                        elif suffix == "_V1_V3":
+
+                            i = 0
+                            while i < num_patients:
+                                pat_id = all_folder_names[i]
+
+                                x = np.searchsorted(ann[:,0], float(pat_id))
+
+                                value = ann[x,1]
+
+                                lead_s = ["V1", "V3"]
+
+                                j = 0
+                                while j < len(lead_s):
+                                    lead = lead_s[j]
+                                    pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                    dim = 0
+                                    while dim < 2:
+                                        if dim == 0:
+                                            part_0 = betti_fun(pers_diagram, dim, pat_id, lead, N)
+                                            dim = dim +1
+                                        else:
+                                            part_1 = betti_fun(pers_diagram, dim, pat_id, lead, N)
+                                            dim = dim +1
+
+                                    if j == 0:
+                                        cpv = put_together(part_0, part_1)
+                                        info = [pat_id]
+                                        info_cpv = put_together(info, cpv)
+                                    elif j == 1:
+                                        cpv = put_together(part_0, part_1)
+                                        info_cpv = put_together(info_cpv, cpv)
+                                        info_cpv.append(value)
+                                        info_cpv = np.array(info_cpv)
+
+                                    j = j+1
+
+                                writer.writerow(info_cpv)
+
+                                i = i+1
+
+                        elif suffix == "_V2_V3":
+
+                            i = 0
+                            while i < num_patients:
+                                pat_id = all_folder_names[i]
+
+                                x = np.searchsorted(ann[:,0], float(pat_id))
+
+                                value = ann[x,1]
+
+                                lead_s = ["V2", "V3"]
+
+                                j = 0
+                                while j < len(lead_s):
+                                    lead = lead_s[j]
+                                    pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                    dim = 0
+                                    while dim < 2:
+                                        if dim == 0:
+                                            part_0 = betti_fun(pers_diagram, dim, pat_id, lead, N)
+                                            dim = dim +1
+                                        else:
+                                            part_1 = betti_fun(pers_diagram, dim, pat_id, lead, N)
+                                            dim = dim +1
+
+                                    if j == 0:
+                                        cpv = put_together(part_0, part_1)
+                                        info = [pat_id]
+                                        info_cpv = put_together(info, cpv)
+                                    elif j == 1:
+                                        cpv = put_together(part_0, part_1)
+                                        info_cpv = put_together(info_cpv, cpv)
+                                        info_cpv.append(value)
+                                        info_cpv = np.array(info_cpv)
+
+                                    j = j+1
+
+                                writer.writerow(info_cpv)
+
+                                i = i+1
+                    
+                    time.sleep(1)
+                    end = time.time()
+
+                    print(f"Total runtime of the Betti Vectorization for {which_R} with N = {N+1} for {which_one} is {end - start} seconds")
+
+                    times.append([vectorization, which_R, suffix, N, (end-start)])
+
+                    n = n+1
+    
+            elif vectorization == "Pers_Vec_Vectorization":
+
+                start = time.time()
+
+                output_csv_file = f"Pers_Vec_Vectorization{suffix}_{which_R}.csv"
+                    
+                which_one = output_csv_file.replace("Pers_Vec_Vectorization_","")
+                with open(output_csv_file, "w", newline="") as f:
+                    writer = csv.writer(f)
+
+                    if suffix == "_all":
+
+                        writer.writerow(["Patient_ID", "Total 0 Count V1", "Total 0 area V1", "Total 1 Count V1", "Total 1 area V1", "Total 0 Count V2", "Total 0 area V2", "Total 1 Count V2", "Total 1 area V2", "Total 0 Count V3", "Total 0 area V3", "Total 1 Count V3", "Total 1 area V3", "Value"])
+
                         i = 0
                         while i < num_patients:
                             pat_id = all_folder_names[i]
@@ -431,106 +712,50 @@ while c < len(Vectorizations):
                             j = 0
                             while j < len(lead_s):
                                 lead = lead_s[j]
-                                pers_diagram = np.genfromtxt(f'{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
                                     if dim == 0:
-                                        part_0 = betti_fun(pers_diagram, dim, pat_id, lead, N)
+                                        part_0 = per_vec_dim(pers_diagram, dim)
                                         dim = dim +1
                                     else:
-                                        part_1 = betti_fun(pers_diagram, dim, pat_id, lead, N)
+                                        part_1 = per_vec_dim(pers_diagram, dim)
                                         dim = dim +1
 
-                                blah = put_together(part_0, part_1)
-                                blah.append(value)
-                                blah = np.array(blah)
+                                if j == 0:
+                                    cpv = put_together(part_0, part_1)
+                                    info = [pat_id]
+                                    info_cpv = put_together(info, cpv)
+                                elif j == 1:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                elif j == 2:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                    info_cpv.append(value)
+                                    info_cpv = np.array(info_cpv)
 
-                                if suffix == "_all":
-                                    writer.writerow(blah)
-                                    j = j+1
-                                elif suffix == "_V1":
-                                    if lead == 'V1':
-                                        writer.writerow(blah)
-                                        j = j+1
-                                    else:
-                                        j = j+1
-                                elif suffix == "_V2":
-                                    if lead == 'V2':
-                                        writer.writerow(blah)
-                                        j = j+1
-                                    else:
-                                        j = j+1
-                                elif suffix == "_V3":
-                                    if lead == 'V3':
-                                        writer.writerow(blah)
-                                        j = j+1
-                                    else:
-                                        j = j+1
-                                elif suffix == "_V1_V2":
-                                    if lead == 'V1' or lead == 'V2':
-                                        writer.writerow(blah)
-                                        j = j+1
-                                    else:
-                                        j = j+1
-                                elif suffix == "_V1_V3":
-                                    if lead == 'V1' or lead == 'V3':
-                                        writer.writerow(blah)
-                                        j = j+1
-                                    else:
-                                        j = j+1
-                                elif suffix == "_V2_V3":
-                                    if lead == 'V2' or lead == 'V3':
-                                        writer.writerow(blah)
-                                        j = j+1
-                                    else:
-                                        j = j+1
+                                j = j+1
+
+                            writer.writerow(info_cpv)
 
                             i = i+1
-                    
-                    time.sleep(1)
-                    end = time.time()
 
-                    print(f"Total runtime of the Betti Vectorization for {which_R} with N = {N+1} for {which_one} is {end - start} seconds")
+                    elif suffix == "_V1":
 
-                    n = n+1
-    
-            elif vectorization == "Pers_Vec_Vectorization":
+                        writer.writerow(["Patient_ID", "Total 0 Count V1", "Total 0 area V1", "Total 1 Count V1", "Total 1 area V1", "Value"])
 
-                start = time.time()
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
 
-                if suffix == "_all":
-                    output_csv_file = f"Pers_Vec_Vectorization_all_{which_R}.csv"
-                elif suffix == "_V1":
-                    output_csv_file = f"Pers_Vec_Vectorization_V1_{which_R}.csv"
-                elif suffix == "_V2":
-                    output_csv_file = f"Pers_Vec_Vectorization_V2_{which_R}.csv"
-                elif suffix == "_V3":
-                    output_csv_file = f"Pers_Vec_Vectorization_V3_{which_R}.csv"
-                elif suffix == "_V1_V2":
-                    output_csv_file = f"Pers_Vec_Vectorization_V1_V2_{which_R}.csv"
-                elif suffix == "_V1_V3":
-                    output_csv_file = f"Pers_Vec_Vectorization_V1_V3_{which_R}.csv"
-                elif suffix == "_V2_V3":
-                    output_csv_file = f"Pers_Vec_Vectorization_V2_V3_{which_R}.csv"
-                    
-                which_one = output_csv_file.replace("Pers_Vec_Vectorization_","")
-                with open(output_csv_file, "w", newline="") as f:
-                    writer = csv.writer(f)
-                    writer.writerow(["Patient_ID", "lead", "Total 0 Count", "Total 0 area", "Total 1 Count", "Total 1 area", "Value"])
-                            
-                    i = 0
-                    while i < num_patients:
-                        pat_id = all_folder_names[i]
+                            x = np.searchsorted(ann[:,0], float(pat_id))
 
-                        x = np.searchsorted(ann[:,0], float(pat_id))
+                            value = ann[x,1]
 
-                        value = ann[x,1]
-
-                        j = 0
-                        while j < len(lead_s):
-                            lead = lead_s[j]
-                            pers_diagram = np.genfromtxt(f'{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                            lead = "V1"
+                            pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                             dim = 0
                             while dim < 2:
@@ -540,96 +765,293 @@ while c < len(Vectorizations):
                                 else:
                                     part_1 = per_vec_dim(pers_diagram, dim)
                                     dim = dim +1
-                            
-                            blah = put_together(part_0, part_1)
-                            info = [pat_id, lead]
-                            blah = put_together(info, blah)
-                            blah.append(value)
-                            blah = np.array(blah)
 
-                            if suffix == "_all":
-                                writer.writerow(blah)
+                            cpv = put_together(part_0, part_1)
+                            info = [pat_id]
+                            info_cpv = put_together(info, cpv)
+                            info_cpv.append(value)
+                            info_cpv = np.array(info_cpv)
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V2":
+
+                        writer.writerow(["Patient_ID", "Total 0 Count V2", "Total 0 area V2", "Total 1 Count V2", "Total 1 area V2", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead = "V2"
+                            pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                            dim = 0
+                            while dim < 2:
+                                if dim == 0:
+                                    part_0 = per_vec_dim(pers_diagram, dim)
+                                    dim = dim +1
+                                else:
+                                    part_1 = per_vec_dim(pers_diagram, dim)
+                                    dim = dim +1
+
+                            cpv = put_together(part_0, part_1)
+                            info = [pat_id]
+                            info_cpv = put_together(info, cpv)
+                            info_cpv.append(value)
+                            info_cpv = np.array(info_cpv)
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V3":
+
+                        writer.writerow(["Patient_ID", "Total 0 Count V3", "Total 0 area V3", "Total 1 Count V3", "Total 1 area V3", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead = "V3"
+                            pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                            dim = 0
+                            while dim < 2:
+                                if dim == 0:
+                                    part_0 = per_vec_dim(pers_diagram, dim)
+                                    dim = dim +1
+                                else:
+                                    part_1 = per_vec_dim(pers_diagram, dim)
+                                    dim = dim +1
+
+                            cpv = put_together(part_0, part_1)
+                            info = [pat_id]
+                            info_cpv = put_together(info, cpv)
+                            info_cpv.append(value)
+                            info_cpv = np.array(info_cpv)
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V1_V2":
+
+                        writer.writerow(["Patient_ID", "Total 0 Count V1", "Total 0 area V1", "Total 1 Count V1", "Total 1 area V1", "Total 0 Count V2", "Total 0 area V2", "Total 1 Count V2", "Total 1 area V2", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead_s = ["V1", "V2"]
+
+                            j = 0
+                            while j < len(lead_s):
+                                lead = lead_s[j]
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = per_vec_dim(pers_diagram, dim)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = per_vec_dim(pers_diagram, dim)
+                                        dim = dim +1
+
+                                if j == 0:
+                                    cpv = put_together(part_0, part_1)
+                                    info = [pat_id]
+                                    info_cpv = put_together(info, cpv)
+                                elif j == 1:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                    info_cpv.append(value)
+                                    info_cpv = np.array(info_cpv)
+
                                 j = j+1
-                            elif suffix == "_V1":
-                                if lead == 'V1':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V2":
-                                if lead == 'V2':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V3":
-                                if lead == 'V3':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V1_V2":
-                                if lead == 'V1' or lead == 'V2':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V1_V3":
-                                if lead == 'V1' or lead == 'V3':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V2_V3":
-                                if lead == 'V2' or lead == 'V3':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
 
-                        i = i+1
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V1_V3":
+
+                        writer.writerow(["Patient_ID", "Total 0 Count V1", "Total 0 area V1", "Total 1 Count V1", "Total 1 area V1", "Total 0 Count V3", "Total 0 area V3", "Total 1 Count V3", "Total 1 area V3", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead_s = ["V1", "V3"]
+
+                            j = 0
+                            while j < len(lead_s):
+                                lead = lead_s[j]
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = per_vec_dim(pers_diagram, dim)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = per_vec_dim(pers_diagram, dim)
+                                        dim = dim +1
+
+                                if j == 0:
+                                    cpv = put_together(part_0, part_1)
+                                    info = [pat_id]
+                                    info_cpv = put_together(info, cpv)
+                                elif j == 1:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                    info_cpv.append(value)
+                                    info_cpv = np.array(info_cpv)
+
+                                j = j+1
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V2_V3":
+
+                        writer.writerow(["Patient_ID", "Total 0 Count V2", "Total 0 area V2", "Total 1 Count V2", "Total 1 area V2", "Total 0 Count V3", "Total 0 area V3", "Total 1 Count V3", "Total 1 area V3", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead_s = ["V2", "V3"]
+
+                            j = 0
+                            while j < len(lead_s):
+                                lead = lead_s[j]
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = per_vec_dim(pers_diagram, dim)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = per_vec_dim(pers_diagram, dim)
+                                        dim = dim +1
+
+                                if j == 0:
+                                    cpv = put_together(part_0, part_1)
+                                    info = [pat_id]
+                                    info_cpv = put_together(info, cpv)
+                                elif j == 1:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                    info_cpv.append(value)
+                                    info_cpv = np.array(info_cpv)
+
+                                j = j+1
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
                     
                     time.sleep(1)
                     end = time.time()
 
                     print(f"Total runtime of the Cumulative Persistence Vectorization for {which_R} for {which_one} is {end - start} seconds")
 
+                    times.append([vectorization, which_R, suffix, 0, (end-start)])
+
             elif vectorization == "Pers_Vec_Vectorization_nooverlap":
 
                 start = time.time()
 
-                if suffix == "_all":
-                    output_csv_file = f"Pers_Vec_Vectorization_nooverlap_all_{which_R}.csv"
-                elif suffix == "_V1":
-                    output_csv_file = f"Pers_Vec_Vectorization_nooverlap_V1_{which_R}.csv"
-                elif suffix == "_V2":
-                    output_csv_file = f"Pers_Vec_Vectorization_nooverlap_V2_{which_R}.csv"
-                elif suffix == "_V3":
-                    output_csv_file = f"Pers_Vec_Vectorization_nooverlap_V3_{which_R}.csv"
-                elif suffix == "_V1_V2":
-                    output_csv_file = f"Pers_Vec_Vectorization_nooverlap_V1_V2_{which_R}.csv"
-                elif suffix == "_V1_V3":
-                    output_csv_file = f"Pers_Vec_Vectorization_nooverlap_V1_V3_{which_R}.csv"
-                elif suffix == "_V2_V3":
-                    output_csv_file = f"Pers_Vec_Vectorization_nooverlap_V2_V3_{which_R}.csv"
+                output_csv_file = f"Pers_Vec_Vectorization_nooverlap{suffix}_{which_R}.csv"
                     
                 which_one = output_csv_file.replace("Pers_Vec_Vectorization_nooverlap_","")
                 with open(output_csv_file, "w", newline="") as f:
                     writer = csv.writer(f)
-                    writer.writerow(["Patient_ID", "lead", "Total 0 Count", "Total 0 area", "Total 1 Count", "Total 1 area", "Value"])
-                            
-                    i = 0
-                    while i < num_patients:
-                        pat_id = all_folder_names[i]
 
-                        x = np.searchsorted(ann[:,0], float(pat_id))
+                    if suffix == "_all":
 
-                        value = ann[x,1]
+                        writer.writerow(["Patient_ID", "Total 0 Count V1", "Total 0 area V1", "Total 1 Count V1", "Total 1 area V1", "Total 0 Count V2", "Total 0 area V2", "Total 1 Count V2", "Total 1 area V2", "Total 0 Count V3", "Total 0 area V3", "Total 1 Count V3", "Total 1 area V3", "Value"])
 
-                        j = 0
-                        while j < len(lead_s):
-                            lead = lead_s[j]
-                            pers_diagram = np.genfromtxt(f'{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            j = 0
+                            while j < len(lead_s):
+                                lead = lead_s[j]
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = per_vec_dim_overlap(pers_diagram, dim)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = per_vec_dim_overlap(pers_diagram, dim)
+                                        dim = dim +1
+
+                                if j == 0:
+                                    cpv = put_together(part_0, part_1)
+                                    info = [pat_id]
+                                    info_cpv = put_together(info, cpv)
+                                elif j == 1:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                elif j == 2:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                    info_cpv.append(value)
+                                    info_cpv = np.array(info_cpv)
+
+                                j = j+1
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V1":
+
+                        writer.writerow(["Patient_ID", "Total 0 Count V1", "Total 0 area V1", "Total 1 Count V1", "Total 1 area V1", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead = "V1"
+                            pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                             dim = 0
                             while dim < 2:
@@ -639,96 +1061,293 @@ while c < len(Vectorizations):
                                 else:
                                     part_1 = per_vec_dim_overlap(pers_diagram, dim)
                                     dim = dim +1
-                            
-                            blah = put_together(part_0, part_1)
-                            info = [pat_id, lead]
-                            blah = put_together(info, blah)
-                            blah.append(value)
-                            blah = np.array(blah)
 
-                            if suffix == "_all":
-                                writer.writerow(blah)
+                            cpv = put_together(part_0, part_1)
+                            info = [pat_id]
+                            info_cpv = put_together(info, cpv)
+                            info_cpv.append(value)
+                            info_cpv = np.array(info_cpv)
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V2":
+
+                        writer.writerow(["Patient_ID", "Total 0 Count V2", "Total 0 area V2", "Total 1 Count V2", "Total 1 area V2", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead = "V2"
+                            pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                            dim = 0
+                            while dim < 2:
+                                if dim == 0:
+                                    part_0 = per_vec_dim_overlap(pers_diagram, dim)
+                                    dim = dim +1
+                                else:
+                                    part_1 = per_vec_dim_overlap(pers_diagram, dim)
+                                    dim = dim +1
+
+                            cpv = put_together(part_0, part_1)
+                            info = [pat_id]
+                            info_cpv = put_together(info, cpv)
+                            info_cpv.append(value)
+                            info_cpv = np.array(info_cpv)
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V3":
+
+                        writer.writerow(["Patient_ID", "Total 0 Count V3", "Total 0 area V3", "Total 1 Count V3", "Total 1 area V3", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead = "V3"
+                            pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                            dim = 0
+                            while dim < 2:
+                                if dim == 0:
+                                    part_0 = per_vec_dim_overlap(pers_diagram, dim)
+                                    dim = dim +1
+                                else:
+                                    part_1 = per_vec_dim_overlap(pers_diagram, dim)
+                                    dim = dim +1
+
+                            cpv = put_together(part_0, part_1)
+                            info = [pat_id]
+                            info_cpv = put_together(info, cpv)
+                            info_cpv.append(value)
+                            info_cpv = np.array(info_cpv)
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V1_V2":
+
+                        writer.writerow(["Patient_ID", "Total 0 Count V1", "Total 0 area V1", "Total 1 Count V1", "Total 1 area V1", "Total 0 Count V2", "Total 0 area V2", "Total 1 Count V2", "Total 1 area V2", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead_s = ["V1", "V2"]
+
+                            j = 0
+                            while j < len(lead_s):
+                                lead = lead_s[j]
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = per_vec_dim_overlap(pers_diagram, dim)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = per_vec_dim_overlap(pers_diagram, dim)
+                                        dim = dim +1
+
+                                if j == 0:
+                                    cpv = put_together(part_0, part_1)
+                                    info = [pat_id]
+                                    info_cpv = put_together(info, cpv)
+                                elif j == 1:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                    info_cpv.append(value)
+                                    info_cpv = np.array(info_cpv)
+
                                 j = j+1
-                            elif suffix == "_V1":
-                                if lead == 'V1':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V2":
-                                if lead == 'V2':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V3":
-                                if lead == 'V3':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V1_V2":
-                                if lead == 'V1' or lead == 'V2':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V1_V3":
-                                if lead == 'V1' or lead == 'V3':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V2_V3":
-                                if lead == 'V2' or lead == 'V3':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
 
-                        i = i+1
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V1_V3":
+
+                        writer.writerow(["Patient_ID", "Total 0 Count V1", "Total 0 area V1", "Total 1 Count V1", "Total 1 area V1", "Total 0 Count V3", "Total 0 area V3", "Total 1 Count V3", "Total 1 area V3", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead_s = ["V1", "V3"]
+
+                            j = 0
+                            while j < len(lead_s):
+                                lead = lead_s[j]
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = per_vec_dim_overlap(pers_diagram, dim)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = per_vec_dim_overlap(pers_diagram, dim)
+                                        dim = dim +1
+
+                                if j == 0:
+                                    cpv = put_together(part_0, part_1)
+                                    info = [pat_id]
+                                    info_cpv = put_together(info, cpv)
+                                elif j == 1:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                    info_cpv.append(value)
+                                    info_cpv = np.array(info_cpv)
+
+                                j = j+1
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V2_V3":
+
+                        writer.writerow(["Patient_ID", "Total 0 Count V2", "Total 0 area V2", "Total 1 Count V2", "Total 1 area V2", "Total 0 Count V3", "Total 0 area V3", "Total 1 Count V3", "Total 1 area V3", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead_s = ["V2", "V3"]
+
+                            j = 0
+                            while j < len(lead_s):
+                                lead = lead_s[j]
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = per_vec_dim_overlap(pers_diagram, dim)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = per_vec_dim_overlap(pers_diagram, dim)
+                                        dim = dim +1
+
+                                if j == 0:
+                                    cpv = put_together(part_0, part_1)
+                                    info = [pat_id]
+                                    info_cpv = put_together(info, cpv)
+                                elif j == 1:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                    info_cpv.append(value)
+                                    info_cpv = np.array(info_cpv)
+
+                                j = j+1
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
                     
                     time.sleep(1)
                     end = time.time()
 
                     print(f"Total runtime of the Cumulative Persistence Vectorization no overlapping triangles for {which_R} for {which_one} is {end - start} seconds")
 
+                    times.append([vectorization, which_R, suffix, 0, (end-start)])
+
             elif vectorization == "Pers_Vec_Vectorization_nocount":
 
                 start = time.time()
 
-                if suffix == "_all":
-                    output_csv_file = f"Pers_Vec_Vectorization_nocount_all_{which_R}.csv"
-                elif suffix == "_V1":
-                    output_csv_file = f"Pers_Vec_Vectorization_nocount_V1_{which_R}.csv"
-                elif suffix == "_V2":
-                    output_csv_file = f"Pers_Vec_Vectorization_nocount_V2_{which_R}.csv"
-                elif suffix == "_V3":
-                    output_csv_file = f"Pers_Vec_Vectorization_nocount_V3_{which_R}.csv"
-                elif suffix == "_V1_V2":
-                    output_csv_file = f"Pers_Vec_Vectorization_nocount_V1_V2_{which_R}.csv"
-                elif suffix == "_V1_V3":
-                    output_csv_file = f"Pers_Vec_Vectorization_nocount_V1_V3_{which_R}.csv"
-                elif suffix == "_V2_V3":
-                    output_csv_file = f"Pers_Vec_Vectorization_nocount_V2_V3_{which_R}.csv"
+                output_csv_file = f"Pers_Vec_Vectorization_nocount{suffix}_{which_R}.csv"
                     
                 which_one = output_csv_file.replace("Pers_Vec_Vectorization_nocount_","")
                 with open(output_csv_file, "w", newline="") as f:
                     writer = csv.writer(f)
-                    writer.writerow(["Patient_ID", "lead", "Total 0 area", "Total 1 area", "Value"])
 
-                    i = 0
-                    while i < num_patients:
-                        pat_id = all_folder_names[i]
+                    if suffix == "_all":
 
-                        x = np.searchsorted(ann[:,0], float(pat_id))
+                        writer.writerow(["Patient_ID", "Total 0 area V1", "Total 1 area V1", "Total 0 area V2", "Total 1 area V2", "Total 0 area V3", "Total 1 area V3", "Value"])
 
-                        value = ann[x,1]
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
 
-                        j = 0
-                        while j < len(lead_s):
-                            lead = lead_s[j]
-                            pers_diagram = np.genfromtxt(f'{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            j = 0
+                            while j < len(lead_s):
+                                lead = lead_s[j]
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = per_vec_dim_nocount(pers_diagram, dim)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = per_vec_dim_nocount(pers_diagram, dim)
+                                        dim = dim +1
+
+                                if j == 0:
+                                    cpv = put_together(part_0, part_1)
+                                    info = [pat_id]
+                                    info_cpv = put_together(info, cpv)
+                                elif j == 1:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                elif j == 2:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                    info_cpv.append(value)
+                                    info_cpv = np.array(info_cpv)
+
+                                j = j+1
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V1":
+
+                        writer.writerow(["Patient_ID", "Total 0 area V1", "Total 1 area V1", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead = "V1"
+                            pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                             dim = 0
                             while dim < 2:
@@ -738,96 +1357,293 @@ while c < len(Vectorizations):
                                 else:
                                     part_1 = per_vec_dim_nocount(pers_diagram, dim)
                                     dim = dim +1
-                            
-                            blah = put_together(part_0, part_1)
-                            info = [pat_id, lead]
-                            blah = put_together(info, blah)
-                            blah.append(value)
-                            blah = np.array(blah)
 
-                            if suffix == "_all":
-                                writer.writerow(blah)
+                            cpv = put_together(part_0, part_1)
+                            info = [pat_id]
+                            info_cpv = put_together(info, cpv)
+                            info_cpv.append(value)
+                            info_cpv = np.array(info_cpv)
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V2":
+
+                        writer.writerow(["Patient_ID", "Total 0 area V2", "Total 1 area V2", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead = "V2"
+                            pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                            dim = 0
+                            while dim < 2:
+                                if dim == 0:
+                                    part_0 = per_vec_dim_nocount(pers_diagram, dim)
+                                    dim = dim +1
+                                else:
+                                    part_1 = per_vec_dim_nocount(pers_diagram, dim)
+                                    dim = dim +1
+
+                            cpv = put_together(part_0, part_1)
+                            info = [pat_id]
+                            info_cpv = put_together(info, cpv)
+                            info_cpv.append(value)
+                            info_cpv = np.array(info_cpv)
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V3":
+
+                        writer.writerow(["Patient_ID", "Total 0 area V3", "Total 1 area V3", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead = "V3"
+                            pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                            dim = 0
+                            while dim < 2:
+                                if dim == 0:
+                                    part_0 = per_vec_dim_nocount(pers_diagram, dim)
+                                    dim = dim +1
+                                else:
+                                    part_1 = per_vec_dim_nocount(pers_diagram, dim)
+                                    dim = dim +1
+
+                            cpv = put_together(part_0, part_1)
+                            info = [pat_id]
+                            info_cpv = put_together(info, cpv)
+                            info_cpv.append(value)
+                            info_cpv = np.array(info_cpv)
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V1_V2":
+
+                        writer.writerow(["Patient_ID", "Total 0 area V1", "Total 1 area V1", "Total 0 area V2", "Total 1 area V2", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead_s = ["V1", "V2"]
+
+                            j = 0
+                            while j < len(lead_s):
+                                lead = lead_s[j]
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = per_vec_dim_nocount(pers_diagram, dim)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = per_vec_dim_nocount(pers_diagram, dim)
+                                        dim = dim +1
+
+                                if j == 0:
+                                    cpv = put_together(part_0, part_1)
+                                    info = [pat_id]
+                                    info_cpv = put_together(info, cpv)
+                                elif j == 1:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                    info_cpv.append(value)
+                                    info_cpv = np.array(info_cpv)
+
                                 j = j+1
-                            elif suffix == "_V1":
-                                if lead == 'V1':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V2":
-                                if lead == 'V2':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V3":
-                                if lead == 'V3':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V1_V2":
-                                if lead == 'V1' or lead == 'V2':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V1_V3":
-                                if lead == 'V1' or lead == 'V3':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V2_V3":
-                                if lead == 'V2' or lead == 'V3':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
 
-                        i = i+1
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V1_V3":
+
+                        writer.writerow(["Patient_ID", "Total 0 area V1", "Total 1 area V1", "Total 0 area V3", "Total 1 area V3", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead_s = ["V1", "V3"]
+
+                            j = 0
+                            while j < len(lead_s):
+                                lead = lead_s[j]
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = per_vec_dim_nocount(pers_diagram, dim)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = per_vec_dim_nocount(pers_diagram, dim)
+                                        dim = dim +1
+
+                                if j == 0:
+                                    cpv = put_together(part_0, part_1)
+                                    info = [pat_id]
+                                    info_cpv = put_together(info, cpv)
+                                elif j == 1:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                    info_cpv.append(value)
+                                    info_cpv = np.array(info_cpv)
+
+                                j = j+1
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V2_V3":
+
+                        writer.writerow(["Patient_ID", "Total 0 area V2", "Total 1 area V2", "Total 0 area V3", "Total 1 area V3", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead_s = ["V2", "V3"]
+
+                            j = 0
+                            while j < len(lead_s):
+                                lead = lead_s[j]
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = per_vec_dim_nocount(pers_diagram, dim)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = per_vec_dim_nocount(pers_diagram, dim)
+                                        dim = dim +1
+
+                                if j == 0:
+                                    cpv = put_together(part_0, part_1)
+                                    info = [pat_id]
+                                    info_cpv = put_together(info, cpv)
+                                elif j == 1:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                    info_cpv.append(value)
+                                    info_cpv = np.array(info_cpv)
+
+                                j = j+1
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
                     
                     time.sleep(1)
                     end = time.time()
 
                     print(f"Total runtime of the Cumulative Persistence Vectorization no count for {which_R} for {which_one} is {end - start} seconds")
 
+                    times.append([vectorization, which_R, suffix, 0, (end-start)])
+
             elif vectorization == "Pers_Vec_Vectorization_nocount_nooverlap":
 
                 start = time.time()
 
-                if suffix == "_all":
-                    output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap_all_{which_R}.csv"
-                elif suffix == "_V1":
-                    output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap_V1_{which_R}.csv"
-                elif suffix == "_V2":
-                    output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap_V2_{which_R}.csv"
-                elif suffix == "_V3":
-                    output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap_V3_{which_R}.csv"
-                elif suffix == "_V1_V2":
-                    output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap_V1_V2_{which_R}.csv"
-                elif suffix == "_V1_V3":
-                    output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap_V1_V3_{which_R}.csv"
-                elif suffix == "_V2_V3":
-                    output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap_V2_V3_{which_R}.csv"
+                output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap{suffix}_{which_R}.csv"
                     
                 which_one = output_csv_file.replace("Pers_Vec_Vectorization_nocount_nooverlap_","")
                 with open(output_csv_file, "w", newline="") as f:
                     writer = csv.writer(f)
-                    writer.writerow(["Patient_ID", "lead", "Total 0 area", "Total 1 area", "Value"])
 
-                    i = 0
-                    while i < num_patients:
-                        pat_id = all_folder_names[i]
+                    if suffix == "_all":
 
-                        x = np.searchsorted(ann[:,0], float(pat_id))
+                        writer.writerow(["Patient_ID", "Total 0 area V1", "Total 1 area V1", "Total 0 area V2", "Total 1 area V2", "Total 0 area V3", "Total 1 area V3", "Value"])
 
-                        value = ann[x,1]
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
 
-                        j = 0
-                        while j < len(lead_s):
-                            lead = lead_s[j]
-                            pers_diagram = np.genfromtxt(f'{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            j = 0
+                            while j < len(lead_s):
+                                lead = lead_s[j]
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = per_vec_dim_nocount_overlap(pers_diagram, dim)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = per_vec_dim_nocount_overlap(pers_diagram, dim)
+                                        dim = dim +1
+
+                                if j == 0:
+                                    cpv = put_together(part_0, part_1)
+                                    info = [pat_id]
+                                    info_cpv = put_together(info, cpv)
+                                elif j == 1:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                elif j == 2:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                    info_cpv.append(value)
+                                    info_cpv = np.array(info_cpv)
+
+                                j = j+1
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V1":
+
+                        writer.writerow(["Patient_ID", "Total 0 area V1", "Total 1 area V1", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead = "V1"
+                            pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                             dim = 0
                             while dim < 2:
@@ -837,96 +1653,293 @@ while c < len(Vectorizations):
                                 else:
                                     part_1 = per_vec_dim_nocount_overlap(pers_diagram, dim)
                                     dim = dim +1
-                            
-                            blah = put_together(part_0, part_1)
-                            info = [pat_id, lead]
-                            blah = put_together(info, blah)
-                            blah.append(value)
-                            blah = np.array(blah)
 
-                            if suffix == "_all":
-                                writer.writerow(blah)
+                            cpv = put_together(part_0, part_1)
+                            info = [pat_id]
+                            info_cpv = put_together(info, cpv)
+                            info_cpv.append(value)
+                            info_cpv = np.array(info_cpv)
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V2":
+
+                        writer.writerow(["Patient_ID", "Total 0 area V2", "Total 1 area V2", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead = "V2"
+                            pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                            dim = 0
+                            while dim < 2:
+                                if dim == 0:
+                                    part_0 = per_vec_dim_nocount_overlap(pers_diagram, dim)
+                                    dim = dim +1
+                                else:
+                                    part_1 = per_vec_dim_nocount_overlap(pers_diagram, dim)
+                                    dim = dim +1
+
+                            cpv = put_together(part_0, part_1)
+                            info = [pat_id]
+                            info_cpv = put_together(info, cpv)
+                            info_cpv.append(value)
+                            info_cpv = np.array(info_cpv)
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V3":
+
+                        writer.writerow(["Patient_ID", "Total 0 area V3", "Total 1 area V3", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead = "V3"
+                            pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                            dim = 0
+                            while dim < 2:
+                                if dim == 0:
+                                    part_0 = per_vec_dim_nocount_overlap(pers_diagram, dim)
+                                    dim = dim +1
+                                else:
+                                    part_1 = per_vec_dim_nocount_overlap(pers_diagram, dim)
+                                    dim = dim +1
+
+                            cpv = put_together(part_0, part_1)
+                            info = [pat_id]
+                            info_cpv = put_together(info, cpv)
+                            info_cpv.append(value)
+                            info_cpv = np.array(info_cpv)
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V1_V2":
+
+                        writer.writerow(["Patient_ID", "Total 0 area V1", "Total 1 area V1", "Total 0 area V2", "Total 1 area V2", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead_s = ["V1", "V2"]
+
+                            j = 0
+                            while j < len(lead_s):
+                                lead = lead_s[j]
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = per_vec_dim_nocount_overlap(pers_diagram, dim)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = per_vec_dim_nocount_overlap(pers_diagram, dim)
+                                        dim = dim +1
+
+                                if j == 0:
+                                    cpv = put_together(part_0, part_1)
+                                    info = [pat_id]
+                                    info_cpv = put_together(info, cpv)
+                                elif j == 1:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                    info_cpv.append(value)
+                                    info_cpv = np.array(info_cpv)
+
                                 j = j+1
-                            elif suffix == "_V1":
-                                if lead == 'V1':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V2":
-                                if lead == 'V2':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V3":
-                                if lead == 'V3':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V1_V2":
-                                if lead == 'V1' or lead == 'V2':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V1_V3":
-                                if lead == 'V1' or lead == 'V3':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V2_V3":
-                                if lead == 'V2' or lead == 'V3':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
 
-                        i = i+1
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V1_V3":
+
+                        writer.writerow(["Patient_ID", "Total 0 area V1", "Total 1 area V1", "Total 0 area V3", "Total 1 area V3", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead_s = ["V1", "V3"]
+
+                            j = 0
+                            while j < len(lead_s):
+                                lead = lead_s[j]
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = per_vec_dim_nocount_overlap(pers_diagram, dim)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = per_vec_dim_nocount_overlap(pers_diagram, dim)
+                                        dim = dim +1
+
+                                if j == 0:
+                                    cpv = put_together(part_0, part_1)
+                                    info = [pat_id]
+                                    info_cpv = put_together(info, cpv)
+                                elif j == 1:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                    info_cpv.append(value)
+                                    info_cpv = np.array(info_cpv)
+
+                                j = j+1
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V2_V3":
+
+                        writer.writerow(["Patient_ID", "Total 0 area V2", "Total 1 area V2", "Total 0 area V3", "Total 1 area V3", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead_s = ["V2", "V3"]
+
+                            j = 0
+                            while j < len(lead_s):
+                                lead = lead_s[j]
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = per_vec_dim_nocount_overlap(pers_diagram, dim)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = per_vec_dim_nocount_overlap(pers_diagram, dim)
+                                        dim = dim +1
+
+                                if j == 0:
+                                    cpv = put_together(part_0, part_1)
+                                    info = [pat_id]
+                                    info_cpv = put_together(info, cpv)
+                                elif j == 1:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                    info_cpv.append(value)
+                                    info_cpv = np.array(info_cpv)
+
+                                j = j+1
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
                     
                     time.sleep(1)
                     end = time.time()
 
                     print(f"Total runtime of the Cumulative Persistence Vectorization no count and no overlapping triangles for {which_R} for {which_one} is {end - start} seconds")
+
+                    times.append([vectorization, which_R, suffix, 0, (end-start)])
             
             elif vectorization == "Pers_Vec_Vectorization_noarea":
 
                 start = time.time()
 
-                if suffix == "_all":
-                    output_csv_file = f"Pers_Vec_Vectorization_noarea_all_{which_R}.csv"
-                elif suffix == "_V1":
-                    output_csv_file = f"Pers_Vec_Vectorization_noarea_V1_{which_R}.csv"
-                elif suffix == "_V2":
-                    output_csv_file = f"Pers_Vec_Vectorization_noarea_V2_{which_R}.csv"
-                elif suffix == "_V3":
-                    output_csv_file = f"Pers_Vec_Vectorization_noarea_V3_{which_R}.csv"
-                elif suffix == "_V1_V2":
-                    output_csv_file = f"Pers_Vec_Vectorization_noarea_V1_V2_{which_R}.csv"
-                elif suffix == "_V1_V3":
-                    output_csv_file = f"Pers_Vec_Vectorization_noarea_V1_V3_{which_R}.csv"
-                elif suffix == "_V2_V3":
-                    output_csv_file = f"Pers_Vec_Vectorization_noarea_V2_V3_{which_R}.csv"
+                output_csv_file = f"Pers_Vec_Vectorization_noarea{suffix}_{which_R}.csv"
                     
                 which_one = output_csv_file.replace("Pers_Vec_Vectorization_noarea_","")
                 with open(output_csv_file, "w", newline="") as f:
                     writer = csv.writer(f)
-                    writer.writerow(["Patient_ID", "lead", "Total 0 Count", "Total 1 Count", "Value"])
 
-                    i = 0
-                    while i < num_patients:
-                        pat_id = all_folder_names[i]
+                    if suffix == "_all":
 
-                        x = np.searchsorted(ann[:,0], float(pat_id))
+                        writer.writerow(["Patient_ID", "Total 0 Count V1", "Total 1 Count V1", "Total 0 Count V2", "Total 1 Count V2", "Total 0 Count V3", "Total 1 Count V3", "Value"])
 
-                        value = ann[x,1]
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
 
-                        j = 0
-                        while j < len(lead_s):
-                            lead = lead_s[j]
-                            pers_diagram = np.genfromtxt(f'{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            j = 0
+                            while j < len(lead_s):
+                                lead = lead_s[j]
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = per_vec_dim_noarea(pers_diagram, dim)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = per_vec_dim_noarea(pers_diagram, dim)
+                                        dim = dim +1
+
+                                if j == 0:
+                                    cpv = put_together(part_0, part_1)
+                                    info = [pat_id]
+                                    info_cpv = put_together(info, cpv)
+                                elif j == 1:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                elif j == 2:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                    info_cpv.append(value)
+                                    info_cpv = np.array(info_cpv)
+
+                                j = j+1
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V1":
+
+                        writer.writerow(["Patient_ID", "Total 0 Count V1", "Total 1 Count V1", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead = "V1"
+                            pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                             dim = 0
                             while dim < 2:
@@ -936,62 +1949,240 @@ while c < len(Vectorizations):
                                 else:
                                     part_1 = per_vec_dim_noarea(pers_diagram, dim)
                                     dim = dim +1
-                            
-                            blah = put_together(part_0, part_1)
-                            info = [pat_id, lead]
-                            blah = put_together(info, blah)
-                            blah.append(value)
-                            blah = np.array(blah)
 
-                            if suffix == "_all":
-                                writer.writerow(blah)
+                            cpv = put_together(part_0, part_1)
+                            info = [pat_id]
+                            info_cpv = put_together(info, cpv)
+                            info_cpv.append(value)
+                            info_cpv = np.array(info_cpv)
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V2":
+
+                        writer.writerow(["Patient_ID", "Total 0 Count V2", "Total 1 Count V2", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead = "V2"
+                            pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                            dim = 0
+                            while dim < 2:
+                                if dim == 0:
+                                    part_0 = per_vec_dim_noarea(pers_diagram, dim)
+                                    dim = dim +1
+                                else:
+                                    part_1 = per_vec_dim_noarea(pers_diagram, dim)
+                                    dim = dim +1
+
+                            cpv = put_together(part_0, part_1)
+                            info = [pat_id]
+                            info_cpv = put_together(info, cpv)
+                            info_cpv.append(value)
+                            info_cpv = np.array(info_cpv)
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V3":
+
+                        writer.writerow(["Patient_ID", "Total 0 Count V3", "Total 1 Count V3", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead = "V3"
+                            pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                            dim = 0
+                            while dim < 2:
+                                if dim == 0:
+                                    part_0 = per_vec_dim_noarea(pers_diagram, dim)
+                                    dim = dim +1
+                                else:
+                                    part_1 = per_vec_dim_noarea(pers_diagram, dim)
+                                    dim = dim +1
+
+                            cpv = put_together(part_0, part_1)
+                            info = [pat_id]
+                            info_cpv = put_together(info, cpv)
+                            info_cpv.append(value)
+                            info_cpv = np.array(info_cpv)
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V1_V2":
+
+                        writer.writerow(["Patient_ID", "Total 0 Count V1", "Total 1 Count V1", "Total 0 Count V2", "Total 1 Count V2", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead_s = ["V1", "V2"]
+
+                            j = 0
+                            while j < len(lead_s):
+                                lead = lead_s[j]
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = per_vec_dim_noarea(pers_diagram, dim)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = per_vec_dim_noarea(pers_diagram, dim)
+                                        dim = dim +1
+
+                                if j == 0:
+                                    cpv = put_together(part_0, part_1)
+                                    info = [pat_id]
+                                    info_cpv = put_together(info, cpv)
+                                elif j == 1:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                    info_cpv.append(value)
+                                    info_cpv = np.array(info_cpv)
+
                                 j = j+1
-                            elif suffix == "_V1":
-                                if lead == 'V1':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V2":
-                                if lead == 'V2':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V3":
-                                if lead == 'V3':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V1_V2":
-                                if lead == 'V1' or lead == 'V2':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V1_V3":
-                                if lead == 'V1' or lead == 'V3':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
-                            elif suffix == "_V2_V3":
-                                if lead == 'V2' or lead == 'V3':
-                                    writer.writerow(blah)
-                                    j = j+1
-                                else:
-                                    j = j+1
 
-                        i = i+1
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V1_V3":
+
+                        writer.writerow(["Patient_ID", "Total 0 Count V1", "Total 1 Count V1", "Total 0 Count V3", "Total 1 Count V3", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead_s = ["V1", "V3"]
+
+                            j = 0
+                            while j < len(lead_s):
+                                lead = lead_s[j]
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = per_vec_dim_noarea(pers_diagram, dim)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = per_vec_dim_noarea(pers_diagram, dim)
+                                        dim = dim +1
+
+                                if j == 0:
+                                    cpv = put_together(part_0, part_1)
+                                    info = [pat_id]
+                                    info_cpv = put_together(info, cpv)
+                                elif j == 1:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                    info_cpv.append(value)
+                                    info_cpv = np.array(info_cpv)
+
+                                j = j+1
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
+
+                    elif suffix == "_V2_V3":
+
+                        writer.writerow(["Patient_ID", "Total 0 Count V2", "Total 1 Count V2", "Total 0 Count V3", "Total 1 Count V3", "Value"])
+
+                        i = 0
+                        while i < num_patients:
+                            pat_id = all_folder_names[i]
+
+                            x = np.searchsorted(ann[:,0], float(pat_id))
+
+                            value = ann[x,1]
+
+                            lead_s = ["V2", "V3"]
+
+                            j = 0
+                            while j < len(lead_s):
+                                lead = lead_s[j]
+                                pers_diagram = np.genfromtxt(f'Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+
+                                dim = 0
+                                while dim < 2:
+                                    if dim == 0:
+                                        part_0 = per_vec_dim_noarea(pers_diagram, dim)
+                                        dim = dim +1
+                                    else:
+                                        part_1 = per_vec_dim_noarea(pers_diagram, dim)
+                                        dim = dim +1
+
+                                if j == 0:
+                                    cpv = put_together(part_0, part_1)
+                                    info = [pat_id]
+                                    info_cpv = put_together(info, cpv)
+                                elif j == 1:
+                                    cpv = put_together(part_0, part_1)
+                                    info_cpv = put_together(info_cpv, cpv)
+                                    info_cpv.append(value)
+                                    info_cpv = np.array(info_cpv)
+
+                                j = j+1
+
+                            writer.writerow(info_cpv)
+
+                            i = i+1
                     
                     time.sleep(1)
                     end = time.time()
 
                     print(f"Total runtime of the Cumulative Persistence Vectorization no area for {which_R} for {which_one} is {end - start} seconds")
+
+                    times.append([vectorization, which_R, suffix, 0, (end-start)])
         
             el = el+1
 
         r = r+1
 
     c = c+1
+
+
+output_csv_file = "Time_Record_for_Vectorization.csv"
+    
+with open(output_csv_file, "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["Vectorization_Method", "Dimension", "Leads", "N", "TIME"])
+
+    i = 0
+    while i<len(times):
+        writer.writerow(times[i])
+        i = i+1
+
+print("COMPLETED THE CODE....")
