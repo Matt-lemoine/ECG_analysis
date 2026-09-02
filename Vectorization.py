@@ -407,7 +407,7 @@ while c < len(Vectorizations):
 
                     N = Ns[n]
 
-                    output_csv_file = f"Betti_Vectorization{suffix}_{N+1}_{which_R}.csv"
+                    output_csv_file = f"Vectorizations_9_1_26/Betti_Vectorization{suffix}_{N+1}_{which_R}.csv"
                         
                     which_one = output_csv_file.replace("Betti_Vectorization_","")
                     with open(output_csv_file, "w", newline="") as f:
@@ -691,7 +691,7 @@ while c < len(Vectorizations):
 
                 start = time.time()
 
-                output_csv_file = f"Pers_Vec_Vectorization{suffix}_{which_R}.csv"
+                output_csv_file = f"Vectorizations_9_1_26/Pers_Vec_Vectorization{suffix}_{which_R}.csv"
                     
                 which_one = output_csv_file.replace("Pers_Vec_Vectorization_","")
                 with open(output_csv_file, "w", newline="") as f:
@@ -987,7 +987,7 @@ while c < len(Vectorizations):
 
                 start = time.time()
 
-                output_csv_file = f"Pers_Vec_Vectorization_nooverlap{suffix}_{which_R}.csv"
+                output_csv_file = f"Vectorizations_9_1_26/Pers_Vec_Vectorization_nooverlap{suffix}_{which_R}.csv"
                     
                 which_one = output_csv_file.replace("Pers_Vec_Vectorization_nooverlap_","")
                 with open(output_csv_file, "w", newline="") as f:
@@ -1283,7 +1283,7 @@ while c < len(Vectorizations):
 
                 start = time.time()
 
-                output_csv_file = f"Pers_Vec_Vectorization_nocount{suffix}_{which_R}.csv"
+                output_csv_file = f"Vectorizations_9_1_26/Pers_Vec_Vectorization_nocount{suffix}_{which_R}.csv"
                     
                 which_one = output_csv_file.replace("Pers_Vec_Vectorization_nocount_","")
                 with open(output_csv_file, "w", newline="") as f:
@@ -1579,7 +1579,7 @@ while c < len(Vectorizations):
 
                 start = time.time()
 
-                output_csv_file = f"Pers_Vec_Vectorization_nocount_nooverlap{suffix}_{which_R}.csv"
+                output_csv_file = f"Vectorizations_9_1_26/Pers_Vec_Vectorization_nocount_nooverlap{suffix}_{which_R}.csv"
                     
                 which_one = output_csv_file.replace("Pers_Vec_Vectorization_nocount_nooverlap_","")
                 with open(output_csv_file, "w", newline="") as f:
@@ -1875,7 +1875,7 @@ while c < len(Vectorizations):
 
                 start = time.time()
 
-                output_csv_file = f"Pers_Vec_Vectorization_noarea{suffix}_{which_R}.csv"
+                output_csv_file = f"Vectorizations_9_1_26/Pers_Vec_Vectorization_noarea{suffix}_{which_R}.csv"
                     
                 which_one = output_csv_file.replace("Pers_Vec_Vectorization_noarea_","")
                 with open(output_csv_file, "w", newline="") as f:
