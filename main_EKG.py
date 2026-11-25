@@ -46,7 +46,7 @@ while cycle < num_patients: # Cycles through patients.
     while leads_to_cycle_through < len(lead_s): # Cycles through leads.
 
         M = 2
-        while M < 5:
+        while M < 5: # This does dimensions 2, 3, and 4.
 
             print(f"START looking at lead {lead_s[leads_to_cycle_through]}")
 

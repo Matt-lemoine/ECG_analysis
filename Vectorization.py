@@ -427,7 +427,7 @@ while c < len(Vectorizations):
                                 j = 0
                                 while j < len(lead_s):
                                     lead = lead_s[j] 
-                                    pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                    pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                     dim = 0
                                     while dim < 2:
@@ -468,7 +468,7 @@ while c < len(Vectorizations):
                                 value = ann[x,1]
 
                                 lead = "V1"
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -500,7 +500,7 @@ while c < len(Vectorizations):
                                 value = ann[x,1]
 
                                 lead = "V2"
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -532,7 +532,7 @@ while c < len(Vectorizations):
                                 value = ann[x,1]
 
                                 lead = "V3"
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -568,7 +568,7 @@ while c < len(Vectorizations):
                                 j = 0
                                 while j < len(lead_s):
                                     lead = lead_s[j]
-                                    pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                    pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                     dim = 0
                                     while dim < 2:
@@ -610,7 +610,7 @@ while c < len(Vectorizations):
                                 j = 0
                                 while j < len(lead_s):
                                     lead = lead_s[j]
-                                    pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                    pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                     dim = 0
                                     while dim < 2:
@@ -652,7 +652,7 @@ while c < len(Vectorizations):
                                 j = 0
                                 while j < len(lead_s):
                                     lead = lead_s[j]
-                                    pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                    pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                     dim = 0
                                     while dim < 2:
@@ -715,7 +715,7 @@ while c < len(Vectorizations):
                             j = 0
                             while j < len(lead_s):
                                 lead = lead_s[j]
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -758,7 +758,7 @@ while c < len(Vectorizations):
                             value = ann[x,1]
 
                             lead = "V1"
-                            pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                            pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                             dim = 0
                             while dim < 2:
@@ -792,7 +792,7 @@ while c < len(Vectorizations):
                             value = ann[x,1]
 
                             lead = "V2"
-                            pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                            pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                             dim = 0
                             while dim < 2:
@@ -826,7 +826,7 @@ while c < len(Vectorizations):
                             value = ann[x,1]
 
                             lead = "V3"
-                            pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                            pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                             dim = 0
                             while dim < 2:
@@ -864,7 +864,7 @@ while c < len(Vectorizations):
                             j = 0
                             while j < len(lead_s):
                                 lead = lead_s[j]
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -908,7 +908,7 @@ while c < len(Vectorizations):
                             j = 0
                             while j < len(lead_s):
                                 lead = lead_s[j]
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -952,7 +952,7 @@ while c < len(Vectorizations):
                             j = 0
                             while j < len(lead_s):
                                 lead = lead_s[j]
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -1013,7 +1013,7 @@ while c < len(Vectorizations):
                             j = 0
                             while j < len(lead_s):
                                 lead = lead_s[j]
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -1056,7 +1056,7 @@ while c < len(Vectorizations):
                             value = ann[x,1]
 
                             lead = "V1"
-                            pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                            pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                             dim = 0
                             while dim < 2:
@@ -1090,7 +1090,7 @@ while c < len(Vectorizations):
                             value = ann[x,1]
 
                             lead = "V2"
-                            pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                            pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                             dim = 0
                             while dim < 2:
@@ -1124,7 +1124,7 @@ while c < len(Vectorizations):
                             value = ann[x,1]
 
                             lead = "V3"
-                            pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                            pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                             dim = 0
                             while dim < 2:
@@ -1162,7 +1162,7 @@ while c < len(Vectorizations):
                             j = 0
                             while j < len(lead_s):
                                 lead = lead_s[j]
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -1206,7 +1206,7 @@ while c < len(Vectorizations):
                             j = 0
                             while j < len(lead_s):
                                 lead = lead_s[j]
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -1250,7 +1250,7 @@ while c < len(Vectorizations):
                             j = 0
                             while j < len(lead_s):
                                 lead = lead_s[j]
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -1311,7 +1311,7 @@ while c < len(Vectorizations):
                             j = 0
                             while j < len(lead_s):
                                 lead = lead_s[j]
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -1354,7 +1354,7 @@ while c < len(Vectorizations):
                             value = ann[x,1]
 
                             lead = "V1"
-                            pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                            pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                             dim = 0
                             while dim < 2:
@@ -1388,7 +1388,7 @@ while c < len(Vectorizations):
                             value = ann[x,1]
 
                             lead = "V2"
-                            pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                            pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                             dim = 0
                             while dim < 2:
@@ -1422,7 +1422,7 @@ while c < len(Vectorizations):
                             value = ann[x,1]
 
                             lead = "V3"
-                            pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                            pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                             dim = 0
                             while dim < 2:
@@ -1460,7 +1460,7 @@ while c < len(Vectorizations):
                             j = 0
                             while j < len(lead_s):
                                 lead = lead_s[j]
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -1504,7 +1504,7 @@ while c < len(Vectorizations):
                             j = 0
                             while j < len(lead_s):
                                 lead = lead_s[j]
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -1548,7 +1548,7 @@ while c < len(Vectorizations):
                             j = 0
                             while j < len(lead_s):
                                 lead = lead_s[j]
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -1609,7 +1609,7 @@ while c < len(Vectorizations):
                             j = 0
                             while j < len(lead_s):
                                 lead = lead_s[j]
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -1652,7 +1652,7 @@ while c < len(Vectorizations):
                             value = ann[x,1]
 
                             lead = "V1"
-                            pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                            pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                             dim = 0
                             while dim < 2:
@@ -1686,7 +1686,7 @@ while c < len(Vectorizations):
                             value = ann[x,1]
 
                             lead = "V2"
-                            pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                            pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                             dim = 0
                             while dim < 2:
@@ -1720,7 +1720,7 @@ while c < len(Vectorizations):
                             value = ann[x,1]
 
                             lead = "V3"
-                            pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                            pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                             dim = 0
                             while dim < 2:
@@ -1758,7 +1758,7 @@ while c < len(Vectorizations):
                             j = 0
                             while j < len(lead_s):
                                 lead = lead_s[j]
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -1802,7 +1802,7 @@ while c < len(Vectorizations):
                             j = 0
                             while j < len(lead_s):
                                 lead = lead_s[j]
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -1846,7 +1846,7 @@ while c < len(Vectorizations):
                             j = 0
                             while j < len(lead_s):
                                 lead = lead_s[j]
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -1907,7 +1907,7 @@ while c < len(Vectorizations):
                             j = 0
                             while j < len(lead_s):
                                 lead = lead_s[j]
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -1950,7 +1950,7 @@ while c < len(Vectorizations):
                             value = ann[x,1]
 
                             lead = "V1"
-                            pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                            pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                             dim = 0
                             while dim < 2:
@@ -1984,7 +1984,7 @@ while c < len(Vectorizations):
                             value = ann[x,1]
 
                             lead = "V2"
-                            pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                            pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                             dim = 0
                             while dim < 2:
@@ -2018,7 +2018,7 @@ while c < len(Vectorizations):
                             value = ann[x,1]
 
                             lead = "V3"
-                            pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                            pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                             dim = 0
                             while dim < 2:
@@ -2056,7 +2056,7 @@ while c < len(Vectorizations):
                             j = 0
                             while j < len(lead_s):
                                 lead = lead_s[j]
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -2100,7 +2100,7 @@ while c < len(Vectorizations):
                             j = 0
                             while j < len(lead_s):
                                 lead = lead_s[j]
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
@@ -2144,7 +2144,7 @@ while c < len(Vectorizations):
                             j = 0
                             while j < len(lead_s):
                                 lead = lead_s[j]
-                                pers_diagram = np.genfromtxt(f'Dynamic_Tau_Persistent_Homology_{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
+                                pers_diagram = np.genfromtxt(f'Persistence_Diagram_R{which_R}/{lead}/{pat_id}_{lead}_pers_info_all_dimensions_simple.csv', delimiter=',', skip_header=1)
 
                                 dim = 0
                                 while dim < 2:
