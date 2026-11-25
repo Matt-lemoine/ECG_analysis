@@ -8,7 +8,7 @@ The data is obtained through the open source data platform PhysioNet. This parti
 
 In `Visualize_EKG.py`, the data can be visualized with all the leads that are of interest.
 
-The data is processed and trimmed down to only include the middle most 6 sinus rhythm periods. This is performed in `Normalize_EKG.py`. The `Spline_approx.py` is used to approximate the ECG reading before passing to the Sliding Window Embedding. This ensures that the ECG readings (and therefore the embeddings) are as smooth as possible.
+The data is processed and trimmed down to only include the middle most 6 sinus rhythm periods. This is performed in `Normalize_EKG.py`. The `All_Trimming_info.csv` file the bounds that are used to trim the ECG's to the middle most 6 sinus periods. The `Spline_approx.py` is then used to approximate the ECG reading before passing to the Sliding Window Embedding. This ensures that the ECG readings (and therefore the embeddings) are as smooth as possible.
 
 When the data is processed and normalized, it is passed to the Sliding Window Embedding https://arxiv.org/abs/1307.6188, in `SWE_Dynamic_T.py`. The data is then projected into a higher dimension where persistent homology can be calculated using `construct_complex.py`.
 
