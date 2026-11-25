@@ -26,7 +26,7 @@ from pathlib import Path
 
 import Visualize_EKG as vekg
 import Normalize_EKG as nekg
-import SWE as swe
+import SWE_Dynamic_T as swe
 import construct_complex as cc
 
 lead_s = ['V1', 'V2', 'V3'] # These are the ones we are interested in at first, because these are the known indicators of Brugada Syndrome.
@@ -51,12 +51,12 @@ while cycle < num_patients: # Cycles through patients.
 
         naming_things = f'{all_folder_names[cycle]}_{lead_s[leads_to_cycle_through]}' # This is for labeling things. It calls the patient number and lead treating it as a str.
 
+        folder = f"Dynamic_Tau_Persistent_Homology_R2/{lead_s[leads_to_cycle_through]}" # This is the location to save the files from the persistence calculation.
 
         "Step 1: Point to the data"
 
         ptf = f'Brugada_dataset/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}'
         lead_in_cycle = [f'{lead_s[leads_to_cycle_through]}'] # This records which lead we are looking at.
-
         
         "Step 2: Normalize EKG signal"
 
@@ -64,46 +64,54 @@ while cycle < num_patients: # Cycles through patients.
         
         "Step 3: SWE"
 
-        tau = 1 # tau=1 is arbitrary, but after testing a few different tau's, taus between 0.75 and 2 gave similar projections.
+        # tau = 1 # tau=1 is arbitrary, but after testing a few different tau's, taus between 0.75 and 2 gave similar projections.
 
-        M = 1
-        while M < 4:
+        file_path = f"{folder}/{naming_things}_pers_diagram.png"
 
-            pro_points = swe.SWE_w_Splines(ptf, lead_in_cycle, tau, M)
-            projected_points = np.array(pro_points)
+        if os.path.exists(file_path):
 
-            print(f"Performed Sliding Window Embedding. Shape = {projected_points.shape}. Now moving to Persistent Homology.")
+            print(f"END looking at lead {lead_s[leads_to_cycle_through]}")
 
-            if len(projected_points) != 615:
-                print("There is a huge error there should only be 615 points.")
+            leads_to_cycle_through += 1
+
+        else: 
+            M = 2
+            while M < 3: ############################################## I am changing it so that it will run one dimension at a time. Starting with R2. When running, edit here so that M = n and while M < n+1 and if M != n+1.
+
+                pro_points = swe.SWE_w_Splines(ptf, lead_in_cycle, M)
+                projected_points = np.array(pro_points)
+
+                print(f"Performed Sliding Window Embedding. Shape = {projected_points.shape}. Now moving to Persistent Homology.")
+
+                # if len(projected_points) != 615:
+                #     print("There is a huge error there should only be 615 points.")
+                #     break
+
+                "Step 4: Persistent Homology of SWE point cloud"
+
+                output_csv_name = f"{naming_things}_pers_info"
+                output_file_graph = f"{folder}/{naming_things}_pers_diagram"
+
+                max_dimension = 2           # This means we will look for the persistent homology for dimensions 0 and 1.
+                max_edge_length = 3
+
+                persistence = cc.construct_calculate(projected_points, max_dimension, max_edge_length, output_csv_name, folder)
+
+                try:
+                    cc.persistence_graph(persistence, output_file_graph)
+                except Exception as e:
+                    print(f"An error occurred during the persistence graph: {e}")
+
+                print("Persistence Calculated")
+
+                M = M+1
+
+            if M != 3:
                 break
 
-            "Step 4: Persistent Homology of SWE point cloud"
+            print(f"END looking at lead {lead_s[leads_to_cycle_through]}")
 
-            folder = f"Persistent_Homology_R{M+1}/{lead_s[leads_to_cycle_through]}"
-            output_csv_name = f"{naming_things}_pers_info"
-            output_file_graph = f"{folder}/{naming_things}_pers_diagram"
-
-            max_dimension = 2           # This means we will look for the persistent homology for dimensions 0 and 1.
-            max_edge_length = 6
-
-            persistence = cc.construct_calculate(projected_points, max_dimension, max_edge_length, output_csv_name, folder)
-
-            try:
-                cc.persistence_graph(persistence, output_file_graph)
-            except Exception as e:
-                print(f"An error occurred during the persistence graph: {e}")
-
-            print("Persistence Calculated")
-
-            M = M+1
-
-        if M != 4:
-            break
-
-        print(f"END looking at lead {lead_s[leads_to_cycle_through]}")
-
-        leads_to_cycle_through += 1
+            leads_to_cycle_through += 1
 
     if leads_to_cycle_through!=3:
         break

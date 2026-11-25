@@ -24,6 +24,10 @@ The output of this file is the accuracy for each of the vectorizations trained u
 
 def do_lssvm(X, y):
 
+    model = NeoLSSVM()
+
+    accuracy_scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+
     cv = StratifiedKFold(
         n_splits=5,
         shuffle=True,
@@ -47,7 +51,7 @@ def do_lssvm(X, y):
         auc = roc_auc_score(y_test, y_score)
         auc_scores.append(auc)
 
-    return np.array(auc_scores)
+    return np.array(auc_scores), accuracy_scores
 
 
 Rns = ['R2', 'R3', 'R4'] # If you have a specific R_n that you are interested in, specify that here.
@@ -80,7 +84,7 @@ while r < len(Rns):
 
                     csv_name = Vec_title + suffix_lead + '_' + str(n) + '_' + str(R_n) + '.csv'
 
-                    file = f'Vectorizations_9_1_26/{csv_name}'
+                    file = f'Vectorizations_10_16_26/{csv_name}'
 
                     print(file)
 
@@ -90,21 +94,24 @@ while r < len(Rns):
                     X = dataset.iloc[:, 0:max_col]
                     y = dataset.iloc[:, max_col].values
 
-                    auc_scores = do_lssvm(X, y)
+                    auc_scores, accuracy_scores = do_lssvm(X, y)
                     mean_auc_score = auc_scores.mean()
                     std_auc_score = auc_scores.std()
+                    mean_accuracy_score = accuracy_scores.mean()
+                    std_accuracy_score = accuracy_scores.std()
                     
                     print(f'Average AUC over 5 fold cross validation for {file} with N = {n} is: {mean_auc_score}')
+                    print(f'Average AUC over 5 fold cross validation for {file} with N = {n} is: {mean_accuracy_score}')
 
-                    All_info_to_be_written.append([Vec_title + suffix_lead, R_n, mean_auc_score, std_auc_score])
-
+                    All_info_to_be_written.append([Vec_title + suffix_lead, R_n, mean_auc_score, std_auc_score, mean_accuracy_score, std_accuracy_score])
+                    
                     i = i+1
 
             else:
 
                 csv_name = Vec_title + suffix_lead  + '_' + str(R_n) + '.csv'
 
-                file = f'Vectorizations_9_1_26/{csv_name}'
+                file = f'Vectorizations_10_16_26/{csv_name}'
 
                 print(file)
 
@@ -114,14 +121,17 @@ while r < len(Rns):
                 X = dataset.iloc[:, 0:max_col]
                 y = dataset.iloc[:, max_col].values
 
-                auc_scores = do_lssvm(X, y)
+                auc_scores, accuracy_scores = do_lssvm(X, y)
                 mean_auc_score = auc_scores.mean()
                 std_auc_score = auc_scores.std()
+                mean_accuracy_score = accuracy_scores.mean()
+                std_accuracy_score = accuracy_scores.std()
 
                 print(f'Average AUC over 5 fold cross validation for {file} is: {mean_auc_score}')
+                print(f'Average AUC over 5 fold cross validation for {file} is: {mean_accuracy_score}')
 
-                All_info_to_be_written.append([Vec_title + suffix_lead, R_n, mean_auc_score, std_auc_score])
-
+                All_info_to_be_written.append([Vec_title + suffix_lead, R_n, mean_auc_score, std_auc_score, mean_accuracy_score, std_accuracy_score])
+                
             el = el+1
         
         v = v+1
@@ -133,7 +143,7 @@ All_info_to_be_written = np.array(All_info_to_be_written)
 output_csv_file = f"All_Results_LSSVM.csv"
 with open(output_csv_file, "w", newline="") as f:
     writer = csv.writer(f)
-    writer.writerow(["Vectorization_Method_and_lead", "R_n", "Mean_AUC", "STD_AUC"])
+    writer.writerow(["Vectorization_Method_and_lead", "R_n", "Mean_AUC", "STD_AUC", "Mean_Accuracy", "STD_Accuracy"])
 
     i = 0
     while i < len(All_info_to_be_written):

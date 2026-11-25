@@ -40,9 +40,9 @@ def do_catboost(X, y, max_depth, learning_rate):
 
     auc_scores = cross_val_score(model, X, y, cv = 5, scoring='roc_auc')
 
-    return auc_scores
+    accuracy_scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
 
-
+    return auc_scores, accuracy_scores
 
 
 
@@ -88,7 +88,7 @@ while mx_dth < len(max_depths):
 
                             csv_name = Vec_title + suffix_lead + '_' + str(n) + '_' + str(R_n) + '.csv'
 
-                            file = f'Vectorizations_9_1_26/{csv_name}'
+                            file = f'Vectorizations_10_16_26/{csv_name}'
 
                             print(file)
 
@@ -98,13 +98,16 @@ while mx_dth < len(max_depths):
                             X = dataset.iloc[:, 0:max_col]
                             y = dataset.iloc[:, max_col].values
 
-                            auc_scores = do_catboost(X, y, max_depth, learning_rate)
+                            auc_scores, accuracy_scores = do_catboost(X, y, max_depth, learning_rate)
                             mean_auc_score = auc_scores.mean()
                             std_auc_score = auc_scores.std()
+                            mean_accuracy_score = accuracy_scores.mean()
+                            std_accuracy_score = accuracy_scores.std()
                             
                             print(f'Average AUC over 5 fold cross validation for {file} with N = {n} is: {mean_auc_score}')
+                            print(f'Average AUC over 5 fold cross validation for {file} with N = {n} is: {mean_accuracy_score}')
 
-                            All_info_to_be_written.append([Vec_title + suffix_lead, R_n, mean_auc_score, std_auc_score])
+                            All_info_to_be_written.append([Vec_title + suffix_lead, R_n, mean_auc_score, std_auc_score, mean_accuracy_score, std_accuracy_score])
 
                             i = i+1
 
@@ -112,7 +115,7 @@ while mx_dth < len(max_depths):
 
                         csv_name = Vec_title + suffix_lead  + '_' + str(R_n) + '.csv'
 
-                        file = f'Vectorizations_9_1_26/{csv_name}'
+                        file = f'Vectorizations_10_16_26/{csv_name}'
 
                         print(file)
 
@@ -122,13 +125,16 @@ while mx_dth < len(max_depths):
                         X = dataset.iloc[:, 0:max_col]
                         y = dataset.iloc[:, max_col].values
 
-                        auc_scores = do_catboost(X, y, max_depth, learning_rate)
+                        auc_scores, accuracy_scores = do_catboost(X, y, max_depth, learning_rate)
                         mean_auc_score = auc_scores.mean()
                         std_auc_score = auc_scores.std()
+                        mean_accuracy_score = accuracy_scores.mean()
+                        std_accuracy_score = accuracy_scores.std()
 
                         print(f'Average AUC over 5 fold cross validation for {file} is: {mean_auc_score}')
+                        print(f'Average AUC over 5 fold cross validation for {file} is: {mean_accuracy_score}')
 
-                        All_info_to_be_written.append([Vec_title + suffix_lead, R_n, mean_auc_score, std_auc_score])
+                        All_info_to_be_written.append([Vec_title + suffix_lead, R_n, mean_auc_score, std_auc_score, mean_accuracy_score, std_accuracy_score])
 
                     el = el+1
                 
@@ -141,7 +147,7 @@ while mx_dth < len(max_depths):
         output_csv_file = f"All_Results_CatBoost_md_{max_depth}_lr_{learning_rate}.csv"
         with open(output_csv_file, "w", newline="") as f:
             writer = csv.writer(f)
-            writer.writerow(["Vectorization_Method_and_lead", "R_n", "Mean_AUC", "STD_AUC"])
+            writer.writerow(["Vectorization_Method_and_lead", "R_n", "Mean_AUC", "STD_AUC", "Mean_Accuracy", "STD_Accuracy"])
 
             i = 0
             while i < len(All_info_to_be_written):
