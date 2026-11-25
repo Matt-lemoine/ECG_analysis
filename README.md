@@ -58,4 +58,4 @@ Place your `Vectorization` folder beside the scripts, or change `INPUT_DIR` in `
 
 Syntax checks passed for all six scripts. The model-specific SVM, AdaBoost, CatBoost and neural-network training/evaluation functions were tested on synthetic data, plus a miniature end-to-end nested-CV run for SVM. The `neo-ls-svm` package was not installed in the verification environment, so the LSSVM runtime path was not executed here.
 
-Code created by Matthew Lemoine, for more information about the project and the results see (insert link here for ArXiv). If you have questions, please email mlemoine559@gmail.com.
+Code created by Matthew Lemoine, for more information about the project and the results see https://matthewlemoine.com/Research.html. If you have questions, please email mlemoine559@gmail.com.
