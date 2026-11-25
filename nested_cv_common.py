@@ -24,7 +24,7 @@ from sklearn.metrics import accuracy_score, roc_auc_score
 
 # ---------------------------- SETTINGS ---------------------------------
 MODEL = 'SVM'  # overridden by each model-specific launcher
-INPUT_DIR = Path('Vectorizations_10_16_26')
+INPUT_DIR = Path('Vectorization')
 OUTPUT_DIR = Path(f'{MODEL}_Nested_Optuna_Results')
 N_TRIALS = 10             # Increase after testing; can be VERY computationally expensive
 N_OUTER_SPLITS = 5
