@@ -3,19 +3,10 @@
 import numpy as np
 import pandas as pd
 import matplotlib as plt
-import wfdb
-import os
-import os.path
 
 from pathlib import Path
 import csv
 import time
-
-import Visualize_EKG as vekg
-import Normalize_EKG as nekg
-import SWE as swe
-import construct_complex as cc
-
 
 def area_of_tri(b,d):
 
