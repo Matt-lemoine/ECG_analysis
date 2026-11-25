@@ -1,0 +1,13 @@
+numpy==2.5.3
+pandas==3.0.6
+matplotlib==3.11.2
+pathlib==1.0.1
+wfdb==4.3.1
+gudhi==3.11.0
+scipy==1.18.1
+xgboost==3.4.1
+optuna==5.0.0
+scikit-learn==1.7.2
+catboost==1.2.10
+torch==2.10.0
+neo-ls-svm==0.3.0
