@@ -1,8 +1,6 @@
 """
 Analysis of Electrocardiography and its properties using the persistent homology of its sliding window embedding.
 
-Created by Matthew Lemoine
-February 2026
 """
 
 """
@@ -47,80 +45,64 @@ while cycle < num_patients: # Cycles through patients.
     leads_to_cycle_through = 0
     while leads_to_cycle_through < len(lead_s): # Cycles through leads.
 
-        print(f"START looking at lead {lead_s[leads_to_cycle_through]}")
+        M = 2
+        while M < 5:
 
-        naming_things = f'{all_folder_names[cycle]}_{lead_s[leads_to_cycle_through]}' # This is for labeling things. It calls the patient number and lead treating it as a str.
+            print(f"START looking at lead {lead_s[leads_to_cycle_through]}")
 
-        folder = f"Dynamic_Tau_Persistent_Homology_R2/{lead_s[leads_to_cycle_through]}" # This is the location to save the files from the persistence calculation.
+            naming_things = f'{all_folder_names[cycle]}_{lead_s[leads_to_cycle_through]}' # This is for labeling things. It calls the patient number and lead treating it as a str.
 
-        "Step 1: Point to the data"
+            folder = f"Persistence_Diagram_R{M}/{lead_s[leads_to_cycle_through]}" # This is the location to save the files from the persistence calculation.
 
-        ptf = f'Brugada_dataset/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}'
-        lead_in_cycle = [f'{lead_s[leads_to_cycle_through]}'] # This records which lead we are looking at.
-        
-        "Step 2: Normalize EKG signal"
+            output_folder = Path(f"{folder}")
+            output_folder.mkdir(parents=True, exist_ok=True)
 
-        # In this normalize_EKG file, it trims the EKG, then approximates the trimmed EKG with Splines, then passes to the SWE.
-        
-        "Step 3: SWE"
+            "Step 1: Point to the data"
 
-        # tau = 1 # tau=1 is arbitrary, but after testing a few different tau's, taus between 0.75 and 2 gave similar projections.
+            ptf = f'Brugada_dataset/files/{all_folder_names[cycle]}/{all_folder_names[cycle]}'
+            lead_in_cycle = [f'{lead_s[leads_to_cycle_through]}'] # This records which lead we are looking at.
+            
+            "Step 2: Normalize EKG signal"
 
-        file_path = f"{folder}/{naming_things}_pers_diagram.png"
+            # In this normalize_EKG file, it trims the EKG, then approximates the trimmed EKG with Splines, then passes to the SWE.
+            
+            "Step 3: SWE"
 
-        if os.path.exists(file_path):
+            pro_points = swe.SWE_w_Splines(ptf, lead_in_cycle, M)
+            projected_points = np.array(pro_points)
 
-            print(f"END looking at lead {lead_s[leads_to_cycle_through]}")
+            print(f"Performed Sliding Window Embedding. Shape = {projected_points.shape}. Now moving to Persistent Homology.")
 
-            leads_to_cycle_through += 1
+            "Step 4: Persistent Homology of SWE point cloud"
 
-        else: 
-            M = 2
-            while M < 3: ############################################## I am changing it so that it will run one dimension at a time. Starting with R2. When running, edit here so that M = n and while M < n+1 and if M != n+1.
+            output_csv_name = f"{naming_things}_pers_info"
+            output_file_graph = f"{folder}/{naming_things}_pers_diagram"
 
-                pro_points = swe.SWE_w_Splines(ptf, lead_in_cycle, M)
-                projected_points = np.array(pro_points)
+            max_dimension = 2 # This means we will look for the persistent homology for dimensions 0 and 1.
+            max_edge_length = 3
 
-                print(f"Performed Sliding Window Embedding. Shape = {projected_points.shape}. Now moving to Persistent Homology.")
+            persistence = cc.construct_calculate(projected_points, max_dimension, max_edge_length, output_csv_name, folder)
 
-                # if len(projected_points) != 615:
-                #     print("There is a huge error there should only be 615 points.")
-                #     break
+            try:
+                cc.persistence_graph(persistence, output_file_graph)
+            except Exception as e:
+                print(f"An error occurred during the persistence graph: {e}")
 
-                "Step 4: Persistent Homology of SWE point cloud"
+            print(f"Persistence Calculated {naming_things} for dimension {M}")
 
-                output_csv_name = f"{naming_things}_pers_info"
-                output_file_graph = f"{folder}/{naming_things}_pers_diagram"
+            M = M+1
 
-                max_dimension = 2           # This means we will look for the persistent homology for dimensions 0 and 1.
-                max_edge_length = 3
+        print(f"END looking at lead {lead_s[leads_to_cycle_through]}")
 
-                persistence = cc.construct_calculate(projected_points, max_dimension, max_edge_length, output_csv_name, folder)
-
-                try:
-                    cc.persistence_graph(persistence, output_file_graph)
-                except Exception as e:
-                    print(f"An error occurred during the persistence graph: {e}")
-
-                print("Persistence Calculated")
-
-                M = M+1
-
-            if M != 3:
-                break
-
-            print(f"END looking at lead {lead_s[leads_to_cycle_through]}")
-
-            leads_to_cycle_through += 1
+        leads_to_cycle_through += 1
 
     if leads_to_cycle_through!=3:
         break
 
-    time_left = (num_patients - cycle -1)*4
-    print(f"****** END ****** looking at patient {all_folder_names[cycle]}. Patient {cycle + 1}/{num_patients}. Approximately {time_left} minutes left.")
+    print(f"****** END ****** looking at patient {all_folder_names[cycle]}. Patient {cycle + 1}/{num_patients}.")
 
     cycle += 1
 
 if cycle != 363:
 
-    print("There was a big mistake somewhere. oops")
+    print("ERROR In the Code!")
